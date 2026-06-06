@@ -49,12 +49,15 @@ const KNOWN_BRANDS = [
 const SERIES_RULES = [
   { brand: "PRIME", series: "Elite 2", patterns: [/\bELITE\s*2\b/, /\bE2\b/], confidence: "high" },
   { brand: "PRIME", series: "Elite 4", patterns: [/\bELITE\s*4\b/, /\bE4\b/], confidence: "high" },
+  { brand: "PRIME", series: "Elite", patterns: [/\bELITE\b/], confidence: "medium" },
   { brand: "PRIME", series: "Trendy K", patterns: [/\bTRENDY\s*K\b/], confidence: "high" },
   { brand: "PRIME", series: "Trendy 3", patterns: [/\bTRENDY\s*3\b/, /\bT3\b/], confidence: "high" },
+  { brand: "PRIME", series: "Trendy", patterns: [/\bTRENDY\b/], confidence: "medium" },
   { brand: "PRIME", series: "Bright 3", patterns: [/\bBRIGHT\s*3\b/, /\bB3\b/], confidence: "high" },
   { brand: "PRIME", series: "Bright", patterns: [/\bBRIGHT\b/], confidence: "medium" },
   { brand: "PRIME", series: "A1 Advanced", patterns: [/\bA1\s*ADVANCED\b/, /\bA1\b/], confidence: "high" },
   { brand: "PRIME", series: "R3 Advanced", patterns: [/\bR3\s*ADVANCED\b/, /\bR3\b/], confidence: "high" },
+  { brand: "PRIME", series: "Advance", patterns: [/\bADVANCE\b/, /\bADVANCED\b/], confidence: "medium" },
   { brand: "PRIME", series: "Vantage 3", patterns: [/\bVANTAGE\s*3\b/, /\bV3\b/], confidence: "high" },
   { brand: "PRIME", series: "Ultra 3", patterns: [/\bULTRA\s*3\b/, /\bU3\b/], confidence: "high" },
   { brand: "PRIME", series: "Estandar", patterns: [/\bESTANDAR\b/], confidence: "medium" },
@@ -62,7 +65,9 @@ const SERIES_RULES = [
   { brand: "MIRAGE", series: "XR", patterns: [/\bXR\b/], confidence: "high" },
   { brand: "MIRAGE", series: "NEX", patterns: [/\bNEX\b/], confidence: "high" },
   { brand: "MIRAGE", series: "X Life", patterns: [/\bX\s*LIFE\b/, /\bXLIFE\b/], confidence: "high" },
-  { brand: "MIRAGE", series: "Life12 Plus", patterns: [/\bLIFE\s*12\s*PLUS\b/], confidence: "high" },
+  { brand: "MIRAGE", series: "Life12 Plus", patterns: [/\bLIFE\s*12\s*(?:PLUS\b|\+)?/], confidence: "high" },
+  { brand: "MIRAGE", series: "Magnum 22", patterns: [/\bMAGNUM\s*22\b/], confidence: "high" },
+  { brand: "MIRAGE", series: "X One", patterns: [/\bX\s*ONE\b/, /\bXONE\b/], confidence: "high" },
   { brand: "MIRAGE", series: "V32", patterns: [/\bV32\b/], confidence: "high" },
   { brand: "MIRAGE", series: "X32", patterns: [/\bX32\b/], confidence: "high" },
 
@@ -76,15 +81,13 @@ const SERIES_RULES = [
   { brand: "LG", series: "Comfort Sleep", patterns: [/\bCOMFORT\s*SLEEP\b/], confidence: "medium" },
   { brand: "LG", series: "Jet Cool", patterns: [/\bJET\s*COOL\b/], confidence: "medium" },
   { brand: "LG", series: "ThinQ", patterns: [/\bTHINQ\b/], confidence: "medium" },
+  { brand: "LG", series: "Artcool", patterns: [/\bART\s*COOL\b/, /\bARTCOOL\b/], confidence: "high" },
 
   { brand: "WHIRLPOOL", series: "Xpert Energy Saver", patterns: [/\bXPERT\s*ENERGY\s*SAVER\b/], confidence: "high" },
   { brand: "WHIRLPOOL", series: "Classic On/Off", patterns: [/\bCLASSIC\s*ON\s*OFF\b/, /\bCLASSIC\s*ON\/OFF\b/], confidence: "high" },
 
   { brand: "SAMSUNG", series: "WindFree", patterns: [/\bWIND\s*FREE\b/, /\bWINDFREE\b/], confidence: "high" },
   { brand: "SAMSUNG", series: "Wind", patterns: [/\bWIND\b/], confidence: "medium" },
-
-  { brand: "MABE", series: "3D Air Flow", patterns: [/\b3D\s*AIR\s*FLOW\b/], confidence: "high" },
-  { brand: "MABE", series: "WiFi Ready", patterns: [/\bWIFI\s*READY\b/, /\bWI-FI\s*READY\b/], confidence: "medium" },
 
   { brand: "IUSA", series: "Primo", patterns: [/\bPRIMO\b/], confidence: "high" },
   { brand: "AURUS", series: "Serie L", patterns: [/\bSERIE\s*L\b/], confidence: "high" },
@@ -210,10 +213,10 @@ function extractProductType(titleNorm) {
     /\b\d+(?:[.,]\d+)?\s*(?:TONELADAS?|TONS?|TON\b|T\b)\b/.test(titleNorm) ||
     /\b(\d{1,3}(?:[,. ]?\d{3})|\d{4,5})\s*(?:BTU(?:\/H)?|BTUS|BTU'S|BTU´S)\b/.test(titleNorm);
   const accessory =
-    /\b(CUBIERTA|DEFLECTOR|REJILLA|MANGUERA|ADAPTADOR|KIT|SOPORTE|FILTRO|CONTROL REMOTO|FUNDA|PANEL(?:ES)? LATERAL|LIMPIEZA|TUBO|SALIDA DE AIRE|VENTILACION DE AIRE|MOLDURA|CLIP|BOLSA)\b/.test(
+    /\b(CUBIERTA|DEFLECTOR|REJILLA|MANGUERA|ADAPTADOR|KIT|SOPORTE|FILTRO|CONTROL REMOTO|CONTROL AIRE|FUNDA|PANEL(?:ES)? LATERAL|LIMPIEZA|TUBO|SALIDA DE AIRE|VENTILACION DE AIRE|MOLDURA|CLIP|BOLSA)\b/.test(
       titleNorm,
     );
-  if (accessory && (!hasCapacityHint || /^(CONTROL REMOTO|CUBIERTA|DEFLECTOR|REJILLA|MANGUERA|ADAPTADOR|KIT|SOPORTE|FILTRO|FUNDA)\b/.test(titleNorm))) {
+  if (accessory && (!hasCapacityHint || /^(CONTROL|CUBIERTA|DEFLECTOR|REJILLA|MANGUERA|ADAPTADOR|KIT|SOPORTE|FILTRO|FUNDA)\b/.test(titleNorm))) {
     return { productType: "accessory", isAirConditioner: false, confidence: "high" };
   }
   if (/\b(VENTILADOR|ENFRIADOR|AIRE LAVADO|AIR COOLER|HUMIDIFICADOR|CALEFACTOR)\b/.test(titleNorm)) {
@@ -278,7 +281,7 @@ function extractTon(titleNorm, btuInfo) {
 function reconcileTonWithBtu(tonInfo, btuInfo) {
   if (!btuInfo.btu) return tonInfo;
   const btuTon = round(btuInfo.btu / 12000, 2);
-  if (Math.abs(btuTon - tonInfo.ton) > 0.2) {
+  if (Math.abs(btuTon - tonInfo.ton) >= 0.15) {
     return {
       ton: btuTon,
       source: "btu_derived_conflict",
@@ -345,11 +348,14 @@ function extractSeer(titleNorm) {
 }
 
 function extractModelCode(titleNorm) {
-  const candidates = [...titleNorm.matchAll(/\b[A-Z]{1,8}[A-Z0-9]{1,12}(?:[-/][A-Z0-9]{1,8})?\b/g)]
+  const candidates = [...titleNorm.matchAll(/\b[A-Z]{1,8}[A-Z0-9]{1,20}(?:[-/][A-Z0-9]{1,8})?\b/g)]
     .map((match) => match[0])
     .filter((token) => {
       if (KNOWN_BRANDS.includes(token)) return false;
       if (/^(BTU|BTUS|FRIO|CALOR|SOLO|MINISPLIT|PORTATIL|VENTANA|INVERTER|WIFI|R32|R410A?|TON|END|MOD)$/.test(token)) {
+        return false;
+      }
+      if (/^END\d+$/.test(token)) {
         return false;
       }
       if (/^\d/.test(token)) return false;
@@ -365,6 +371,7 @@ function primeSeriesFromSuffix(suffix) {
     E2: "Elite 2",
     E4: "Elite 4",
     B3: "Bright 3",
+    B: "Bright family",
     V3: "Vantage 3",
     U3: "Ultra 3",
     A1: "A1 Advanced",
