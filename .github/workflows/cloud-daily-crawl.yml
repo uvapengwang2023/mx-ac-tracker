@@ -1,0 +1,116 @@
+name: Cloud Daily Crawl
+
+on:
+  schedule:
+    # 09:00 Mexico City during standard UTC-6 offset. Adjust if you want a different local time.
+    - cron: "0 15 * * *"
+  workflow_dispatch:
+    inputs:
+      sites:
+        description: "Comma-separated sites to crawl"
+        required: false
+        default: "coppel,elektra,homedepotmx"
+      publish_pages:
+        description: "Deploy web/competitor-intel-dashboard to GitHub Pages"
+        required: false
+        default: "false"
+        type: choice
+        options:
+          - "false"
+          - "true"
+      allow_direct_ip:
+        description: "Manual testing only: allow direct cloud IP for crawlers that normally require proxy"
+        required: false
+        default: "false"
+        type: choice
+        options:
+          - "false"
+          - "true"
+
+permissions:
+  contents: read
+  actions: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: cloud-daily-crawl
+  cancel-in-progress: false
+
+env:
+  DEFAULT_SITES: coppel,elektra,homedepotmx
+  PROXY_URL: ${{ secrets.PROXY_URL }}
+  VPN_CHECK_URL: ${{ secrets.VPN_CHECK_URL }}
+  DAILY_CRAWL_NOTIFY: "false"
+  DAILY_CRAWL_STRICT_PREFLIGHT: "true"
+  DAILY_CRAWL_ALLOW_DIRECT_IP: ${{ github.event.inputs.allow_direct_ip || 'false' }}
+
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Restore crawler data cache
+        uses: actions/cache/restore@v4
+        with:
+          path: data
+          key: mx-ac-data-${{ github.run_id }}
+          restore-keys: |
+            mx-ac-data-
+
+      - name: Run daily crawl
+        env:
+          CRAWL_SITES: ${{ github.event.inputs.sites || env.DEFAULT_SITES }}
+        run: |
+          npm run daily:crawl -- --sites="${CRAWL_SITES}" --strict-preflight
+
+      - name: Upload crawler artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mx-ac-crawl-${{ github.run_id }}
+          path: |
+            data/daily_crawls/**
+            data/*/latest_products.json
+            data/*/runs/latest_run.json
+            data/*/reports/latest_price_changes.json
+            web/competitor-intel-dashboard/**
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Save crawler data cache
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: data
+          key: mx-ac-data-${{ github.run_id }}
+
+      - name: Setup Pages
+        if: ${{ github.event.inputs.publish_pages == 'true' || vars.PUBLISH_PAGES == 'true' }}
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        if: ${{ github.event.inputs.publish_pages == 'true' || vars.PUBLISH_PAGES == 'true' }}
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: web/competitor-intel-dashboard
+
+      - name: Deploy to GitHub Pages
+        if: ${{ github.event.inputs.publish_pages == 'true' || vars.PUBLISH_PAGES == 'true' }}
+        uses: actions/deploy-pages@v4

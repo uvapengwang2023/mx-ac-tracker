@@ -1,0 +1,7 @@
+saved_at=2026-02-16 18:29:42 -03
+base_dir=/Users/luke2026/AI project/墨西哥电商数据-空调
+files:
+- scripts/crawl_walmartmx.js
+- run_walmartmx.command
+- README.md
+note=Manual confirm gate retained; verify-only removed.

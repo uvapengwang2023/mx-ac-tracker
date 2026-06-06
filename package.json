@@ -1,0 +1,22 @@
+{
+  "name": "mx-ac-tracker",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "crawl:coppel": "node scripts/crawl_coppel.js",
+    "crawl:elektra": "node scripts/crawl_elektra.js",
+    "crawl:homedepotmx": "node scripts/crawl_homedepotmx.js",
+    "crawl:walmartmx": "node scripts/crawl_walmartmx.js",
+    "probe:walmartmx": "node scripts/probe_walmartmx.js",
+    "record:today": "node scripts/append_project_record.js",
+    "daily:crawl": "node scripts/run_daily_crawls.js",
+    "daily:install": "node scripts/install_daily_crawl_launchd.js",
+    "daily:uninstall": "node scripts/install_daily_crawl_launchd.js --uninstall",
+    "dashboard:build": "node scripts/build_competitor_dashboard_data.js",
+    "dashboard:serve": "python3 -m http.server 4173 --directory web/competitor-intel-dashboard"
+  },
+  "dependencies": {
+    "playwright": "^1.58.2"
+  }
+}

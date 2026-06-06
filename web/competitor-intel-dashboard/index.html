@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>墨西哥空调竞品情报台</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Mexico AC Competitive Intelligence</p>
+        <h1>墨西哥空调竞品情报台</h1>
+      </div>
+      <div class="freshness">
+        <span>数据生成</span>
+        <strong id="generatedAt">-</strong>
+      </div>
+    </header>
+
+    <main>
+      <section class="toolbar" aria-label="Filters">
+        <label>
+          平台
+          <select id="siteFilter"></select>
+        </label>
+        <label>
+          品类
+          <select id="categoryFilter"></select>
+        </label>
+        <label>
+          品牌
+          <input id="brandSearch" type="search" placeholder="输入品牌或型号" />
+        </label>
+      </section>
+
+      <section class="kpi-grid" id="kpiGrid" aria-label="Key metrics"></section>
+
+      <section class="layout-two">
+        <article class="panel wide">
+          <div class="panel-head">
+            <div>
+              <h2>价格趋势</h2>
+              <p>按平台追踪每日中位价与商品数量。</p>
+            </div>
+            <select id="trendMetric">
+              <option value="medianPrice">中位价</option>
+              <option value="avgPrice">均价</option>
+              <option value="productCount">商品数</option>
+            </select>
+          </div>
+          <div id="trendChart" class="trend-chart" role="img" aria-label="平台价格趋势图"></div>
+          <div id="trendLegend" class="legend"></div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>价格带</h2>
+              <p>当前 SKU 分布。</p>
+            </div>
+          </div>
+          <div id="priceBands" class="bar-list"></div>
+        </article>
+      </section>
+
+      <section class="layout-two">
+        <article class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>平台概览</h2>
+              <p>抓取覆盖、价格和变动。</p>
+            </div>
+          </div>
+          <div id="siteCards" class="site-list"></div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>品牌集中度</h2>
+              <p>自动识别品牌，人工复核关键对手。</p>
+            </div>
+          </div>
+          <div id="brandLeaderboard" class="rank-list"></div>
+        </article>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>AI 自动化执行清单</h2>
+            <p>按闭环顺序推进，每一项都有验收标准和人工关口。</p>
+          </div>
+        </div>
+        <div class="checklist-grid" id="executionChecklist"></div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>AI 自动化边界</h2>
+            <p>哪些信息适合自动更新，哪些需要你拍板。</p>
+          </div>
+        </div>
+        <div class="automation-grid" id="automationGrid"></div>
+      </section>
+
+      <section class="layout-two">
+        <article class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>机会板</h2>
+              <p>由当前数据自动生成的分析线索。</p>
+            </div>
+          </div>
+          <div id="insights" class="insight-list"></div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-head">
+            <div>
+              <h2>人工输入项</h2>
+              <p>这些会决定结论质量。</p>
+            </div>
+          </div>
+          <ul id="humanInputs" class="check-list"></ul>
+        </article>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>重点变价</h2>
+            <p>按变动幅度排序。</p>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>平台</th>
+                <th>商品</th>
+                <th>旧价</th>
+                <th>新价</th>
+                <th>变化</th>
+              </tr>
+            </thead>
+            <tbody id="priceChangeRows"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>产品库</h2>
+            <p>当前筛选结果：<strong id="productCount">0</strong> 个 SKU。</p>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>图</th>
+                <th>平台</th>
+                <th>品牌</th>
+                <th>商品</th>
+                <th>品类</th>
+                <th>吨位</th>
+                <th>电压</th>
+                <th>价格</th>
+                <th>折扣</th>
+              </tr>
+            </thead>
+            <tbody id="productRows"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="methodology">
+        <h2>数据口径</h2>
+        <div id="methodology"></div>
+      </section>
+    </main>
+
+    <script src="./data.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>

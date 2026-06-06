@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Coppel PDP Detail Preview</title>
+<style>
+body{font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; margin:24px; color:#111; background:#f7f7f8}
+.card{background:#fff;border:1px solid #ddd;border-radius:10px;padding:16px;margin-bottom:16px}
+table{width:100%;border-collapse:collapse;font-size:13px;background:#fff}
+th,td{border:1px solid #ddd;padding:8px;vertical-align:top}
+th{background:#f1f4f9;text-align:left}
+pre{white-space:pre-wrap;word-break:break-word;background:#0f172a;color:#e2e8f0;padding:12px;border-radius:8px}
+a{color:#0b57d0;text-decoration:none}
+a:hover{text-decoration:underline}
+</style>
+</head>
+<body>
+<div class="card">
+<h2>Coppel 产品详情抓取预览（小样本）</h2>
+<p>样本数: <b>6</b> | JSON: <code>/Users/luke2026/AI project/墨西哥电商数据-空调/data/coppel/detail_preview.json</code></p>
+</div>
+<div class="card">
+<table>
+<thead>
+<tr>
+<th>状态</th><th>SKU/链接</th><th>产品名</th><th>卖家</th><th>Sale(MXN)</th><th>Original(MXN)</th><th>Specs</th><th>Brand</th><th>Name=H1</th><th>Discount逻辑</th><th>Sale=LDJSON</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+      <td>PASS</td>
+      <td><a href="https://www.coppel.com/pdp/minisplit-mabe-inverter-1-tonelada-115-v-solo-frio-mmi12cabwca32mc2-pm-6657383" target="_blank">665738</a></td>
+      <td>Minisplit Mabe Inverter 1 Tonelada 115 V Solo Frío MMI12CABWCA32MC2</td>
+      <td>Vendido y entregado por Coppel</td>
+      <td>5499</td>
+      <td>10999</td>
+      <td>17</td>
+      <td>Mabe</td>
+      <td>true</td>
+      <td>true</td>
+      <td>true</td>
+    </tr>
+<tr>
+      <td>PASS</td>
+      <td><a href="https://www.coppel.com/pdp/mini-split-inverter-175-seer-r32-bajo-impacto-ambiental-solo-frio-24000-btu-220-v-color-blanco-mkp-747269209" target="_blank">747269209</a></td>
+      <td>Mini Split Inverter 17.5 Seer R32 Bajo Impacto Ambiental Solo Frío 24000 Btu 220 V Color Blanco</td>
+      <td>Vendido y entregado por ComproYa</td>
+      <td>13276</td>
+      <td></td>
+      <td>4</td>
+      <td>Mirage</td>
+      <td>true</td>
+      <td>true</td>
+      <td>true</td>
+    </tr>
+<tr>
+      <td>PASS</td>
+      <td><a href="https://www.coppel.com/pdp/mini-split-magnum-22-seer-r410a-solo-frio-24000-btu-220-v-color-blanco-mkp-747269211" target="_blank">747269211</a></td>
+      <td>Mini Split Magnum 22 Seer R410a Solo Frío 24000 Btu 220 V Color Blanco</td>
+      <td>Vendido y entregado por MARES AIR</td>
+      <td>18199</td>
+      <td>23499</td>
+      <td>4</td>
+      <td>Mirage</td>
+      <td>true</td>
+      <td>true</td>
+      <td>true</td>
+    </tr>
+<tr>
+      <td>PASS</td>
+      <td><a href="https://www.coppel.com/pdp/minisplit-mirage-1-tonelada-115-v-solo-frio-setcbf120k-pm-6655763" target="_blank">665576</a></td>
+      <td>Minisplit Mirage 1 Tonelada 115 V Solo Frío SETCBF120K</td>
+      <td>Vendido y entregado por Coppel</td>
+      <td>5899</td>
+      <td>6599</td>
+      <td>15</td>
+      <td>Mirage</td>
+      <td>true</td>
+      <td>true</td>
+      <td>true</td>
+    </tr>
+<tr>
+      <td>PASS</td>
+      <td><a href="https://www.coppel.com/pdp/minisplit-mirage-1-tonelada-230-v-solo-frio-setcbf121k-pm-6655413" target="_blank">665541</a></td>
+      <td>Minisplit Mirage 1 Tonelada 230 V Solo Frío SETCBF121K</td>
+      <td>Vendido y entregado por Coppel</td>
+      <td>5899</td>
+      <td>6599</td>
+      <td>10</td>
+      <td>Mirage</td>
+      <td>true</td>
+      <td>true</td>
+      <td>true</td>
+    </tr>
+<tr>
+      <td>PASS</td>
+      <td><a href="https://www.coppel.com/pdp/minisplit-mirage-nex-1-ton-220-v-solo-frio-mkp-72391421" target="_blank">72391421</a></td>
+      <td>Minisplit Mirage Nex 1 Ton 220 V Solo Frío</td>
+      <td>Vendido y entregado por ComproYa</td>
+      <td>5867</td>
+      <td></td>
+      <td>4</td>
+      <td>Mirage</td>
+      <td>true</td>
+      <td>true</td>
+      <td>true</td>
+    </tr>
+</tbody>
+</table>
+</div>
+<div class="card">
+<h3>逐条原始详情</h3>
+<details>
+      <summary>665738 | Minisplit Mabe Inverter 1 Tonelada 115 V Solo Frío MMI12CABWCA32MC2</summary>
+      <pre>{
+  "product_url": "https://www.coppel.com/pdp/minisplit-mabe-inverter-1-tonelada-115-v-solo-frio-mmi12cabwca32mc2-pm-6657383",
+  "pdp_name": "Minisplit Mabe Inverter 1 Tonelada 115 V Solo Frío MMI12CABWCA32MC2",
+  "h1": "Minisplit Mabe Inverter 1 Tonelada 115 V Solo Frío MMI12CABWCA32MC2",
+  "pdp_sku": "665738",
+  "pdp_sku_text": "Código de producto (SKU): 665738",
+  "pdp_sold_by": "Vendido y entregado por Coppel",
+  "pdp_sale_price_raw": "$5,499",
+  "pdp_sale_price_mxn": 5499,
+  "pdp_original_price_raw": "$10,999",
+  "pdp_original_price_mxn": 10999,
+  "pdp_payment_plan": "Desde $308 quincenales",
+  "pdp_weekly_plan": "($7,369 en 24 quincenas*)",
+  "pdp_savings_text": "Ahorro $5,500 (50%)",
+  "pdp_shipping_delivery": "Envío gratis*",
+  "pdp_shipping_instruction": "*Dependerá del domicilio de entrega",
+  "pdp_about_bullets": [
+    "SEER: 17.5",
+    "Marca: Mabe",
+    "Velocidades de ventilación: 3",
+    "Garantía: 24 meses",
+    "Inverter: Sí"
+  ],
+  "pdp_description": "¡Evita que el calor afecte tu descanso! Reduce la temperatura de tus habitaciones al instalar este minisplit de la marca Mabe, modelo MMI12CABWCA32MC2. Cuenta con tecnología Inverter, para reducir la velocidad del motor y ahorrar energía. Tiene una capacidad de 1 tonelada y voltaje de 115 V. Presenta una climatización en solo frío y se conecta a Wi-Fi. Incluye control remoto. ¡Es perfecto para colocar en tu recámara! Pídelo con algunos clics en Coppel.com y recíbelo directo en tu casa.",
+  "pdp_specs_count": 17,
+  "pdp_specs_json": {
+    "SEER": "17.5",
+    "Marca": "Mabe",
+    "Velocidades de ventilación": "3",
+    "Garantía": "24 meses",
+    "Inverter": "Sí",
+    "Voltaje de operación": "115 V",
+    "Modelo #": "MMI12CABWCA32MC2",
+    "Tipo de climatización": "Frío",
+    "Capacidad en BTU": "12000",
+    "Modelo": "MMI12CABWCA32MC2",
+    "Conectividad": "Wifi",
+    "Funciones": "función eco",
+    "Color": "Blanco",
+    "Tipo de producto": "Minisplit",
+    "Medidas": "80 x 20 x 29 cm",
+    "Capacidad": "1 tonelada",
+    "Incluye": "Control remoto"
+  },
+  "ldjson_brand_name": "Mabe",
+  "ldjson_offer_price_mxn": 5499,
+  "ldjson_offer_currency": "MXN",
+  "ldjson_offer_availability": "https://schema.org/InStock",
+  "check_name_match": true,
+  "check_sale_vs_ldjson": true,
+  "check_discount_logic": true
+}</pre>
+    </details>
+<details>
+      <summary>747269209 | Mini Split Inverter 17.5 Seer R32 Bajo Impacto Ambiental Solo Frío 24000 Btu 220 V Color Blanco</summary>
+      <pre>{
+  "product_url": "https://www.coppel.com/pdp/mini-split-inverter-175-seer-r32-bajo-impacto-ambiental-solo-frio-24000-btu-220-v-color-blanco-mkp-747269209",
+  "pdp_name": "Mini Split Inverter 17.5 Seer R32 Bajo Impacto Ambiental Solo Frío 24000 Btu 220 V Color Blanco",
+  "h1": "Mini Split Inverter 17.5 Seer R32 Bajo Impacto Ambiental Solo Frío 24000 Btu 220 V Color Blanco",
+  "pdp_sku": "747269209",
+  "pdp_sku_text": "Código de producto (SKU): 747269209",
+  "pdp_sold_by": "Vendido y entregado por ComproYa",
+  "pdp_sale_price_raw": "$13,276",
+  "pdp_sale_price_mxn": 13276,
+  "pdp_original_price_raw": "",
+  "pdp_original_price_mxn": null,
+  "pdp_payment_plan": "Desde $803 quincenales",
+  "pdp_weekly_plan": "($19,251 en 24 quincenas*)",
+  "pdp_savings_text": "",
+  "pdp_shipping_delivery": "Envío gratis*",
+  "pdp_shipping_instruction": "*Dependerá del domicilio de entrega",
+  "pdp_about_bullets": [
+    "Marca: Mirage",
+    "Color: Blanco",
+    "Material: plastico",
+    "Medidas: 102-85-31"
+  ],
+  "pdp_description": "Mini split Inverter 17.5 seer, R32 bajo impacto ambiental, Solo frío, 24000 BTU, 220 V, color blanco",
+  "pdp_specs_count": 4,
+  "pdp_specs_json": {
+    "Marca": "Mirage",
+    "Color": "Blanco",
+    "Material": "plastico",
+    "Medidas": "102-85-31"
+  },
+  "ldjson_brand_name": "Mirage",
+  "ldjson_offer_price_mxn": 13276,
+  "ldjson_offer_currency": "MXN",
+  "ldjson_offer_availability": "https://schema.org/InStock",
+  "check_name_match": true,
+  "check_sale_vs_ldjson": true,
+  "check_discount_logic": true
+}</pre>
+    </details>
+<details>
+      <summary>747269211 | Mini Split Magnum 22 Seer R410a Solo Frío 24000 Btu 220 V Color Blanco</summary>
+      <pre>{
+  "product_url": "https://www.coppel.com/pdp/mini-split-magnum-22-seer-r410a-solo-frio-24000-btu-220-v-color-blanco-mkp-747269211",
+  "pdp_name": "Mini Split Magnum 22 Seer R410a Solo Frío 24000 Btu 220 V Color Blanco",
+  "h1": "Mini Split Magnum 22 Seer R410a Solo Frío 24000 Btu 220 V Color Blanco",
+  "pdp_sku": "747269211",
+  "pdp_sku_text": "Código de producto (SKU): 747269211",
+  "pdp_sold_by": "Vendido y entregado por MARES AIR",
+  "pdp_sale_price_raw": "$18,199",
+  "pdp_sale_price_mxn": 18199,
+  "pdp_original_price_raw": "$23,499",
+  "pdp_original_price_mxn": 23499,
+  "pdp_payment_plan": "Desde $1,100 quincenales",
+  "pdp_weekly_plan": "($26,389 en 24 quincenas*)",
+  "pdp_savings_text": "Ahorro $5,300 (23%)",
+  "pdp_shipping_delivery": "Envío gratis*",
+  "pdp_shipping_instruction": "*Dependerá del domicilio de entrega",
+  "pdp_about_bullets": [
+    "Marca: Mirage",
+    "Color: Blanco",
+    "Material: plastico",
+    "Medidas: 108-93-33"
+  ],
+  "pdp_description": "Mini split MAGNUM 22 seer, R410a, Solo frío, 24000 BTU, 220 V, Color blanco",
+  "pdp_specs_count": 4,
+  "pdp_specs_json": {
+    "Marca": "Mirage",
+    "Color": "Blanco",
+    "Material": "plastico",
+    "Medidas": "108-93-33"
+  },
+  "ldjson_brand_name": "Mirage",
+  "ldjson_offer_price_mxn": 18199,
+  "ldjson_offer_currency": "MXN",
+  "ldjson_offer_availability": "https://schema.org/InStock",
+  "check_name_match": true,
+  "check_sale_vs_ldjson": true,
+  "check_discount_logic": true
+}</pre>
+    </details>
+<details>
+      <summary>665576 | Minisplit Mirage 1 Tonelada 115 V Solo Frío SETCBF120K</summary>
+      <pre>{
+  "product_url": "https://www.coppel.com/pdp/minisplit-mirage-1-tonelada-115-v-solo-frio-setcbf120k-pm-6655763",
+  "pdp_name": "Minisplit Mirage 1 Tonelada 115 V Solo Frío SETCBF120K",
+  "h1": "Minisplit Mirage 1 Tonelada 115 V Solo Frío SETCBF120K",
+  "pdp_sku": "665576",
+  "pdp_sku_text": "Código de producto (SKU): 665576",
+  "pdp_sold_by": "Vendido y entregado por Coppel",
+  "pdp_sale_price_raw": "$5,899",
+  "pdp_sale_price_mxn": 5899,
+  "pdp_original_price_raw": "$6,599",
+  "pdp_original_price_mxn": 6599,
+  "pdp_payment_plan": "Desde $330 quincenales",
+  "pdp_weekly_plan": "($7,905 en 24 quincenas*)",
+  "pdp_savings_text": "Ahorro $700 (11%)",
+  "pdp_shipping_delivery": "Envío gratis*",
+  "pdp_shipping_instruction": "*Dependerá del domicilio de entrega",
+  "pdp_about_bullets": [
+    "SEER: 12",
+    "Marca: Mirage",
+    "Garantía: 24 meses",
+    "Inverter: No",
+    "Modelo #: SETCBF120K"
+  ],
+  "pdp_description": "¡Escapa del calor y disfruta de un nivel perfecto de confort gracias a tu minisplit de Mirage! Refrescar cualquier espacio es más sencillo cuando enciendes el modelo SETCBF120K, con capacidad de 1 tonelada para brindarle a cada rincón una brisa de frescura. ¡Los veranos se van a disfrutar aún más! Diseñado para durar. Con 12000 BTUS y 12 SEERS, tu nuevo minisplit de Mirage cuenta con todo lo que buscas para tardes relajantes y cómodas. ¿Qué esperas para finalizar tu pedido?",
+  "pdp_specs_count": 15,
+  "pdp_specs_json": {
+    "SEER": "12",
+    "Marca": "Mirage",
+    "Garantía": "24 meses",
+    "Inverter": "No",
+    "Modelo #": "SETCBF120K",
+    "Capacidad en BTU": "12000",
+    "Conectividad": "Sin conectividad",
+    "Voltaje de operación": "115 V",
+    "Funciones": "enfriamiento",
+    "Color": "Blanco",
+    "Tipo de producto": "Minisplit",
+    "Medidas": "79 x 19.2 x 27.5 cm",
+    "Tipo de climatización": "Frío",
+    "Capacidad": "1 tonelada",
+    "Incluye": "evaporador"
+  },
+  "ldjson_brand_name": "Mirage",
+  "ldjson_offer_price_mxn": 5899,
+  "ldjson_offer_currency": "MXN",
+  "ldjson_offer_availability": "https://schema.org/InStock",
+  "check_name_match": true,
+  "check_sale_vs_ldjson": true,
+  "check_discount_logic": true
+}</pre>
+    </details>
+<details>
+      <summary>665541 | Minisplit Mirage 1 Tonelada 230 V Solo Frío SETCBF121K</summary>
+      <pre>{
+  "product_url": "https://www.coppel.com/pdp/minisplit-mirage-1-tonelada-230-v-solo-frio-setcbf121k-pm-6655413",
+  "pdp_name": "Minisplit Mirage 1 Tonelada 230 V Solo Frío SETCBF121K",
+  "h1": "Minisplit Mirage 1 Tonelada 230 V Solo Frío SETCBF121K",
+  "pdp_sku": "665541",
+  "pdp_sku_text": "Código de producto (SKU): 665541",
+  "pdp_sold_by": "Vendido y entregado por Coppel",
+  "pdp_sale_price_raw": "$5,899",
+  "pdp_sale_price_mxn": 5899,
+  "pdp_original_price_raw": "$6,599",
+  "pdp_original_price_mxn": 6599,
+  "pdp_payment_plan": "Desde $330 quincenales",
+  "pdp_weekly_plan": "($7,905 en 24 quincenas*)",
+  "pdp_savings_text": "Ahorro $700 (11%)",
+  "pdp_shipping_delivery": "Envío gratis*",
+  "pdp_shipping_instruction": "*Dependerá del domicilio de entrega",
+  "pdp_about_bullets": [
+    "Modelo #: SETCBF121K",
+    "SEER: 12",
+    "Marca: Mirage",
+    "Capacidad en BTU: 12000",
+    "Voltaje de operación: 230 V"
+  ],
+  "pdp_description": "¡Dile adiós a las tardes de calor! Instala en tu hogar este minisplit de Mirage y consigue que tus actividades en el interior sean más cómodas y frescas. El modelo SETCWF121E, de 1 tonelada, va a llevar una brisa de aire helado a cada rincón de tu hogar con su nivel de enfriamiento. Mantén la temperatura ideal en cualquier temporada por su capacidad de enfriamiento de 12,000 BTU y su voltaje de 230 V. Adquiere este minisplit Mirage de una tonelada en Coppel.com con solo unos clics.",
+  "pdp_specs_count": 10,
+  "pdp_specs_json": {
+    "Modelo #": "SETCBF121K",
+    "SEER": "12",
+    "Marca": "Mirage",
+    "Capacidad en BTU": "12000",
+    "Voltaje de operación": "230 V",
+    "Color": "Blanco",
+    "Tipo de producto": "Minisplit",
+    "Medidas": "79 x 19.2 x 27.5 cm",
+    "Tipo de climatización": "Frío",
+    "Capacidad": "1 tonelada"
+  },
+  "ldjson_brand_name": "Mirage",
+  "ldjson_offer_price_mxn": 5899,
+  "ldjson_offer_currency": "MXN",
+  "ldjson_offer_availability": "https://schema.org/InStock",
+  "check_name_match": true,
+  "check_sale_vs_ldjson": true,
+  "check_discount_logic": true
+}</pre>
+    </details>
+<details>
+      <summary>72391421 | Minisplit Mirage Nex 1 Ton 220 V Solo Frío</summary>
+      <pre>{
+  "product_url": "https://www.coppel.com/pdp/minisplit-mirage-nex-1-ton-220-v-solo-frio-mkp-72391421",
+  "pdp_name": "Minisplit Mirage Nex 1 Ton 220 V Solo Frío",
+  "h1": "Minisplit Mirage Nex 1 Ton 220 V Solo Frío",
+  "pdp_sku": "72391421",
+  "pdp_sku_text": "Código de producto (SKU): 72391421",
+  "pdp_sold_by": "Vendido y entregado por ComproYa",
+  "pdp_sale_price_raw": "$5,867",
+  "pdp_sale_price_mxn": 5867,
+  "pdp_original_price_raw": "",
+  "pdp_original_price_mxn": null,
+  "pdp_payment_plan": "Desde $355 quincenales",
+  "pdp_weekly_plan": "($8,508 en 24 quincenas*)",
+  "pdp_savings_text": "",
+  "pdp_shipping_delivery": "Envío gratis*",
+  "pdp_shipping_instruction": "*Dependerá del domicilio de entrega",
+  "pdp_about_bullets": [
+    "Marca: Mirage",
+    "Medidas: 83",
+    "Material: Plástico y metal",
+    "Color: Blanco"
+  ],
+  "pdp_description": "El Mirage NEX es un minisplit diseñado para ofrecer un enfriamiento eficiente y confiable en espacios residenciales y comerciales. Con una capacidad de 12,000 BTU/h, es ideal para habitaciones de tamaño mediano, garantizando un ambiente confortable durante todo el año.",
+  "pdp_specs_count": 4,
+  "pdp_specs_json": {
+    "Marca": "Mirage",
+    "Medidas": "83",
+    "Material": "Plástico y metal",
+    "Color": "Blanco"
+  },
+  "ldjson_brand_name": "Mirage",
+  "ldjson_offer_price_mxn": 5867,
+  "ldjson_offer_currency": "MXN",
+  "ldjson_offer_availability": "https://schema.org/InStock",
+  "check_name_match": true,
+  "check_sale_vs_ldjson": true,
+  "check_discount_logic": true
+}</pre>
+    </details>
+</div>
+</body>
+</html>
