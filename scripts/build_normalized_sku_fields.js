@@ -371,7 +371,6 @@ function primeSeriesFromSuffix(suffix) {
     E2: "Elite 2",
     E4: "Elite 4",
     B3: "Bright 3",
-    B: "Bright family",
     V3: "Vantage 3",
     U3: "Ultra 3",
     A1: "A1 Advanced",
