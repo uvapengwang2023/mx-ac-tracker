@@ -30,6 +30,7 @@ The daily wrapper then:
 - checks target reachability through `PROXY_URL` when present;
 - runs the selected crawlers in sequence;
 - writes/updates the SQLite database at `data/ac_price_monitor_mexico_v2.db`;
+- builds normalized SKU fields at `data/normalized_skus/latest_normalized_skus.json`;
 - builds daily alerts at `data/daily_alerts/latest_alerts.json`;
 - writes logs under `data/daily_crawls/`;
 - rebuilds `web/competitor-intel-dashboard/data.js`;
@@ -46,6 +47,7 @@ Artifacts include:
 
 - `data/ac_price_monitor_mexico_v2.db`
 - `data/ac_price_monitor_mexico_v2.db-*` when SQLite WAL sidecar files exist
+- `data/normalized_skus/**`
 - `data/daily_alerts/**`
 - latest per-site product snapshots and run summaries
 - `web/competitor-intel-dashboard/**`
@@ -75,6 +77,32 @@ DAILY_ALERT_MIN_DELTA_MXN
 DAILY_ALERT_MIN_DELTA_PCT
 DAILY_ALERT_LIMIT
 ```
+
+## Normalized SKU Fields
+
+After the crawlers finish, `npm run sku:normalize` converts product titles into comparable fields and writes:
+
+```text
+data/normalized_skus/latest_normalized_skus.json
+data/normalized_skus/latest_normalized_skus.csv
+```
+
+It also upserts the SQLite table `sku_normalized_fields`.
+
+The first MVP extracts:
+
+- brand;
+- product series;
+- model code;
+- product type;
+- capacity in Ton and BTU;
+- voltage class;
+- inverter / on-off signal;
+- cooling mode;
+- refrigerant and WiFi when present;
+- confidence score and review flags.
+
+Product series is handled carefully: explicit title series names are treated as higher confidence, while model-prefix families are kept as lower-confidence `model_family` values until manually calibrated.
 
 ## Publishing The Web Dashboard
 

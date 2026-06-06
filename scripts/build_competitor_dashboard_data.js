@@ -7,6 +7,7 @@ const OUT_DIR = path.join(ROOT, "web", "competitor-intel-dashboard");
 const OUT_FILE = path.join(OUT_DIR, "data.js");
 const DB_PATH = path.join(ROOT, "data", "ac_price_monitor_mexico_v2.db");
 const ALERTS_PATH = "data/daily_alerts/latest_alerts.json";
+const NORMALIZED_SKUS_PATH = "data/normalized_skus/latest_normalized_skus.json";
 
 const SITE_CONFIG = [
   {
@@ -110,6 +111,10 @@ function normalizePrice(value) {
   return Number.isFinite(num) ? num : null;
 }
 
+function sourceProductId(row) {
+  return normalizeText(row.product_id || row.sku_id || row.pdp_sku || row.ldjson_sku || row.detail_model || row.product_url || row.link);
+}
+
 function median(values) {
   const nums = values.filter((value) => Number.isFinite(value)).sort((a, b) => a - b);
   if (!nums.length) {
@@ -197,6 +202,13 @@ function inferInverter(name) {
   return /inverter/i.test(name);
 }
 
+function coolingModeLabel(value) {
+  return {
+    solo_frio: "Solo frio",
+    frio_calor: "Frio/calor",
+  }[value] || null;
+}
+
 function discountPct(price, originalPrice) {
   if (!Number.isFinite(price) || !Number.isFinite(originalPrice) || originalPrice <= price) {
     return null;
@@ -222,18 +234,25 @@ function compactRun(run) {
   };
 }
 
-function normalizeProduct(row, site) {
+function normalizeProduct(row, site, normalized = null) {
   const name = normalizeText(row.name || row.title);
   const price = normalizePrice(row.sale_price_mxn || row.detail_sale_price_mxn || row.price);
   const originalPrice = normalizePrice(
     row.original_price_mxn || row.detail_original_price_mxn || row.list_price_mxn || row.price_without_discount_mxn,
   );
-  const productId = normalizeText(row.product_id || row.sku_id || row.pdp_sku || row.ldjson_sku || row.product_url);
-  const brand = inferBrand(row);
-  const category = inferCategory(name);
-  const capacityTon = inferCapacityTon(name);
-  const voltage = inferVoltage(name);
-  const inverter = inferInverter(name);
+  const productId = sourceProductId(row);
+  const brand = normalized?.brandNorm || inferBrand(row);
+  const category = normalized?.productTypeLabel || inferCategory(name);
+  const capacityTon = Number.isFinite(normalized?.capacityTon) ? normalized.capacityTon : inferCapacityTon(name);
+  const voltage = normalized?.voltageClass || inferVoltage(name);
+  const inverter = typeof normalized?.inverter === "boolean" ? normalized.inverter : inferInverter(name);
+  const series = normalized?.productSeries || "未识别";
+  const modelCode = normalized?.modelCode || null;
+  const coolingMode = coolingModeLabel(normalized?.coolingMode);
+  const isAirConditioner =
+    typeof normalized?.isAirConditioner === "boolean"
+      ? normalized.isAirConditioner
+      : !["Ventilador/Enfriador", "Accesorio", "Otros"].includes(category);
   return {
     id: `${site.id}:${productId || name}`,
     siteId: site.id,
@@ -241,10 +260,21 @@ function normalizeProduct(row, site) {
     productId,
     title: name,
     brand,
+    series,
+    seriesDisplay: series === "未识别" ? "未识别" : `${brand} / ${series}`,
+    seriesConfidence: normalized?.seriesConfidence || "unknown",
+    seriesType: normalized?.seriesType || "unknown",
+    modelCode,
     category,
     capacityTon,
     voltage,
     inverter,
+    coolingMode,
+    isAirConditioner,
+    normalizedProductType: normalized?.productType || null,
+    normalizedConfidence: normalized?.confidenceScore ?? null,
+    needsReview: Boolean(normalized?.reviewFlags?.length),
+    reviewFlags: normalized?.reviewFlags || [],
     price,
     originalPrice,
     discountPct: discountPct(price, originalPrice),
@@ -500,13 +530,13 @@ function buildExecutionChecklist() {
       id: "A02",
       priority: "P0",
       title: "SKU 标准字段自动抽取",
-      objective: "把标题和详情页转换成可比较字段：品牌、吨位/BTU、电压、变频、冷暖、安装类型。",
+      objective: "把标题和详情页转换成可比较字段：品牌、产品系列、型号、吨位/BTU、电压、变频、冷暖、安装类型。",
       dataNeeded: "商品标题、PDP 详情、pdp_specs_json/detail_specs_json、Prime 规格表",
-      aiAutomation: "规则 + AI 抽取规格，生成 confidence 和待人工复核列表。",
-      output: "normalized_specs 表/JSON，产品库可按规格筛选",
+      aiAutomation: "规则抽取标题字段，优先识别标题中的明确系列名，其次用低置信度型号族补充，生成 confidence 和待人工复核列表。",
+      output: "data/normalized_skus/latest_normalized_skus.json/csv + SQLite sku_normalized_fields 表",
       acceptance: "核心字段覆盖率超过 85%；低置信度 SKU 单独列出；抽样 30 个关键 SKU 准确率可接受。",
       humanGate: "定义标准字段口径，确认 1T/12000 BTU、110/115/127V 等等价规则。",
-      status: "下一步",
+      status: "已打底",
       pageModule: "产品库、规格覆盖、筛选器",
     },
     {
@@ -606,6 +636,18 @@ async function main() {
   const allProducts = [];
   const allChanges = [];
   const siteSummaries = [];
+  const normalizedSkus = await readJson(NORMALIZED_SKUS_PATH, {
+    status: "missing",
+    summary: {},
+    bySeries: [],
+    byReviewFlag: [],
+    rows: [],
+  });
+  const normalizedByKey = new Map(
+    (normalizedSkus.rows || [])
+      .filter((row) => row.siteId && row.productId)
+      .map((row) => [`${row.siteId}:${row.productId}`, row]),
+  );
   const dailyAlerts = await readJson(ALERTS_PATH, {
     status: "missing",
     summary: {
@@ -629,7 +671,7 @@ async function main() {
     const changes = asArray(await readJson(site.changesPath, []));
     const run = compactRun(await readJson(site.runPath, null));
     const rows = latest
-      .map((row) => normalizeProduct(row, site))
+      .map((row) => normalizeProduct(row, site, normalizedByKey.get(`${site.id}:${sourceProductId(row)}`)))
       .filter((row) => row.title && Number.isFinite(row.price));
     const normalizedChanges = changes.map((row) => normalizeChange(row, site));
     allProducts.push(...rows);
@@ -665,6 +707,10 @@ async function main() {
       dailyPriceIncreases: dailyAlerts.summary?.priceIncreases || 0,
       dailyNewProducts: dailyAlerts.summary?.newProducts || 0,
       dailyRemovedProducts: dailyAlerts.summary?.removedProducts || 0,
+      skuSeriesCoveragePct: normalizedSkus.summary?.seriesCoveragePct || 0,
+      skuNamedSeriesCoveragePct: normalizedSkus.summary?.namedSeriesCoveragePct || 0,
+      skuCapacityCoveragePct: normalizedSkus.summary?.capacityCoveragePct || 0,
+      skuReviewNeeded: normalizedSkus.summary?.reviewNeeded || 0,
       inferredBrandCoveragePct: round(
         ((allProducts.length - allProducts.filter((row) => row.brand === "未识别").length) / allProducts.length) * 100,
         1,
@@ -682,8 +728,19 @@ async function main() {
       .slice(0, 60),
     priceBands,
     brandLeaderboard: summarizeDimension(allProducts, "brand", 16),
+    seriesLeaderboard: summarizeDimension(
+      allProducts.filter((row) => row.isAirConditioner && row.series && row.series !== "未识别"),
+      "seriesDisplay",
+      16,
+    ),
     categoryMix: summarizeDimension(allProducts, "category", 10),
     trend,
+    skuNormalization: {
+      source: NORMALIZED_SKUS_PATH,
+      generatedAt: normalizedSkus.generatedAt || null,
+      summary: normalizedSkus.summary || {},
+      byReviewFlag: normalizedSkus.byReviewFlag || [],
+    },
     dailyAlerts,
     insights: buildInsights({ rows: allProducts, sites: siteSummaries, priceBands, changes: allChanges, trend }),
     executionChecklist: buildExecutionChecklist(),
@@ -698,9 +755,11 @@ async function main() {
       })),
       historySource: "data/ac_price_monitor_mexico_v2.db: price_facts + product_master",
       alertsSource: ALERTS_PATH,
+      normalizedSkuSource: NORMALIZED_SKUS_PATH,
       fieldNotes: [
         "价格使用 sale_price_mxn；original_price_mxn 仅作为折扣参考。",
         "提醒中心来自 SQLite price_facts 的最新日期与历史日期对比，可用于发现降价、涨价、上新、下架和抓取覆盖异常。",
+        "SKU 标准字段来自标题和已抓取字段的规则抽取；产品系列优先使用标题中的明确系列名，其次才使用低置信度型号族。",
         "品牌、品类、吨位、电压、变频字段为标题/已抓取字段推断，适合作为候选分类，关键 SKU 仍需人工复核。",
         "现有数据不包含真实销量、广告投放、评分评论和线下渠道政策；网页会把这些标为人工/后续数据源。",
       ],

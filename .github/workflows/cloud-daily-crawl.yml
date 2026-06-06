@@ -87,6 +87,7 @@ jobs:
           name: mx-ac-crawl-${{ github.run_id }}
           path: |
             data/daily_crawls/**
+            data/normalized_skus/**
             data/daily_alerts/**
             data/ac_price_monitor_mexico_v2.db
             data/ac_price_monitor_mexico_v2.db-*

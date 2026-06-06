@@ -264,7 +264,8 @@ input {
 .insight-list,
 .automation-grid,
 .checklist-grid,
-.alert-grid {
+.alert-grid,
+.quality-grid {
   display: grid;
   gap: 10px;
 }
@@ -391,11 +392,35 @@ input {
 .site-card,
 .rank-row,
 .insight,
-.automation-card {
+.automation-card,
+.quality-card {
   border: 1px solid var(--line);
   border-radius: 8px;
   padding: 12px;
   background: #fbfcfb;
+}
+
+.quality-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.quality-card span {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.quality-card strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 22px;
+}
+
+.quality-card small,
+.empty-note {
+  color: var(--muted);
+  font-size: 12px;
 }
 
 .site-card header,
@@ -628,7 +653,8 @@ td a {
   .kpi-grid,
   .automation-grid,
   .checklist-grid,
-  .alert-grid {
+  .alert-grid,
+  .quality-grid {
     grid-template-columns: 1fr;
   }
 

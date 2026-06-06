@@ -56,6 +56,7 @@ function parseArgs(argv) {
     dryRun: false,
     skipPreflight: false,
     strictPreflight: false,
+    buildSkuFields: true,
     buildDashboard: true,
     buildAlerts: true,
     interactive: false,
@@ -67,6 +68,7 @@ function parseArgs(argv) {
     if (arg === "--dry-run") args.dryRun = true;
     else if (arg === "--skip-preflight") args.skipPreflight = true;
     else if (arg === "--strict-preflight") args.strictPreflight = true;
+    else if (arg === "--no-sku-normalize") args.buildSkuFields = false;
     else if (arg === "--no-dashboard-build") args.buildDashboard = false;
     else if (arg === "--no-alerts-build") args.buildAlerts = false;
     else if (arg === "--interactive") args.interactive = true;
@@ -328,6 +330,7 @@ async function main() {
     logPath,
     preflight: null,
     results: [],
+    skuNormalization: null,
     alertsBuild: null,
     dashboardBuild: null,
     overallStatus: "running",
@@ -390,7 +393,20 @@ async function main() {
   }
 
   const anyFailed = summary.results.some((result) => result.status === "failed");
-  if (!anyFailed && args.buildAlerts) {
+  if (!anyFailed && args.buildSkuFields) {
+    await appendLog(logPath, "\nNormalizing SKU fields...");
+    summary.skuNormalization = await runCommand({
+      label: "SKU normalization",
+      npmArgs: ["run", "sku:normalize"],
+      logPath,
+      env,
+      dryRun: args.dryRun,
+      interactive: false,
+    });
+    await appendLog(logPath, `SKU normalization: ${summary.skuNormalization.status}`);
+  }
+
+  if (!anyFailed && summary.skuNormalization?.status !== "failed" && args.buildAlerts) {
     await appendLog(logPath, "\nBuilding daily alerts...");
     summary.alertsBuild = await runCommand({
       label: "Daily alerts",
@@ -403,7 +419,12 @@ async function main() {
     await appendLog(logPath, `Daily alerts: ${summary.alertsBuild.status}`);
   }
 
-  if (!anyFailed && summary.alertsBuild?.status !== "failed" && args.buildDashboard) {
+  if (
+    !anyFailed &&
+    summary.skuNormalization?.status !== "failed" &&
+    summary.alertsBuild?.status !== "failed" &&
+    args.buildDashboard
+  ) {
     await appendLog(logPath, "\nBuilding dashboard data...");
     summary.dashboardBuild = await runCommand({
       label: "Dashboard data",
@@ -418,7 +439,10 @@ async function main() {
 
   summary.finishedAt = new Date().toISOString();
   summary.overallStatus =
-    anyFailed || summary.alertsBuild?.status === "failed" || summary.dashboardBuild?.status === "failed"
+    anyFailed ||
+    summary.skuNormalization?.status === "failed" ||
+    summary.alertsBuild?.status === "failed" ||
+    summary.dashboardBuild?.status === "failed"
       ? "failed"
       : "success";
   await appendLog(logPath, `\nDaily crawl finished: ${summary.overallStatus}`);

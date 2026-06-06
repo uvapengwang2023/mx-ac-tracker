@@ -332,6 +332,48 @@ function renderBrandLeaderboard() {
     .join("");
 }
 
+function renderSeriesLeaderboard() {
+  const rows = data.seriesLeaderboard || [];
+  const max = Math.max(...rows.map((series) => series.count), 1);
+  $("seriesLeaderboard").innerHTML = rows.length
+    ? rows
+        .map(
+          (series) => `
+        <div class="rank-row">
+          <strong title="${escapeHtml(series.name)}">${escapeHtml(series.name)}</strong>
+          <span>${formatNumber(series.count)} SKU</span>
+          <span>${formatMoney(series.medianPrice)}</span>
+          <div class="bar-track" style="grid-column: 1 / -1"><div class="bar-fill" style="width:${(series.count / max) * 100}%"></div></div>
+        </div>
+      `,
+        )
+        .join("")
+    : `<p class="empty-note">暂无可展示系列。</p>`;
+}
+
+function renderSkuQuality() {
+  const summary = data.skuNormalization?.summary || {};
+  const items = [
+    ["真空调 SKU", formatNumber(summary.airConditionerProducts || 0), "已过滤风扇/配件噪音"],
+    ["系列覆盖", `${summary.seriesCoveragePct || 0}%`, `明确系列 ${summary.namedSeriesCoveragePct || 0}%`],
+    ["容量覆盖", `${summary.capacityCoveragePct || 0}%`, "Ton/BTU"],
+    ["电压覆盖", `${summary.voltageCoveragePct || 0}%`, "110/127V 或 220/230V"],
+    ["冷暖覆盖", `${summary.coolingModeCoveragePct || 0}%`, "Solo frio / frio-calor"],
+    ["待复核", formatNumber(summary.reviewNeeded || 0), "低置信度或缺字段"],
+  ];
+  $("skuQuality").innerHTML = items
+    .map(
+      ([label, value, note]) => `
+        <article class="quality-card">
+          <span>${escapeHtml(label)}</span>
+          <strong>${escapeHtml(value)}</strong>
+          <small>${escapeHtml(note)}</small>
+        </article>
+      `,
+    )
+    .join("");
+}
+
 function renderAutomation() {
   $("automationGrid").innerHTML = data.automationMatrix
     .map(
@@ -433,10 +475,13 @@ function renderProducts() {
           <td>${image}</td>
           <td>${escapeHtml(product.site)}</td>
           <td>${escapeHtml(product.brand)}</td>
+          <td>${escapeHtml(product.series || "-")}</td>
+          <td>${escapeHtml(product.modelCode || "-")}</td>
           <td class="product-title">${title}</td>
           <td>${escapeHtml(product.category)}</td>
           <td>${product.capacityTon ? `${product.capacityTon}T` : "-"}</td>
           <td>${escapeHtml(product.voltage || "-")}</td>
+          <td>${escapeHtml(product.coolingMode || "-")}</td>
           <td>${formatMoney(product.price)}</td>
           <td>${product.discountPct ? `${product.discountPct}%` : "-"}</td>
         </tr>
@@ -449,6 +494,7 @@ function renderMethodology() {
   $("methodology").innerHTML = `
     <p>历史来源：${escapeHtml(data.methodology.historySource)}</p>
     <p>提醒来源：${escapeHtml(data.methodology.alertsSource || "data/daily_alerts/latest_alerts.json")}</p>
+    <p>SKU 标准字段来源：${escapeHtml(data.methodology.normalizedSkuSource || "data/normalized_skus/latest_normalized_skus.json")}</p>
     <ul>
       ${data.methodology.fieldNotes.map((note) => `<li>${escapeHtml(note)}</li>`).join("")}
     </ul>
@@ -464,6 +510,8 @@ function renderAll() {
   renderPriceBands();
   renderSites();
   renderBrandLeaderboard();
+  renderSkuQuality();
+  renderSeriesLeaderboard();
   renderExecutionChecklist();
   renderAutomation();
   renderInsights();
