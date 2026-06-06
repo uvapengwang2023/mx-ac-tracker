@@ -374,6 +374,134 @@ function renderSkuQuality() {
     .join("");
 }
 
+function competitorData() {
+  return (
+    data.competitorCandidates || {
+      summary: {},
+      byCandidateBrand: [],
+      targetGroups: [],
+      methodology: {},
+    }
+  );
+}
+
+function specText(product) {
+  const parts = [
+    product.capacityTon ? `${product.capacityTon}T` : null,
+    product.voltageClass || null,
+    product.inverter === true ? "变频" : product.inverter === false ? "定频" : null,
+    product.coolingMode === "solo_frio" ? "单冷" : product.coolingMode === "frio_calor" ? "冷暖" : null,
+  ].filter(Boolean);
+  return parts.length ? parts.join(" / ") : "规格待补";
+}
+
+function tierClass(tier) {
+  return {
+    direct: "strong",
+    close: "medium",
+    benchmark: "low",
+    internal_reference: "neutral",
+    watch: "neutral",
+  }[tier] || "neutral";
+}
+
+function renderCompetitorCandidates() {
+  const candidates = competitorData();
+  const summary = candidates.summary || {};
+  const items = [
+    ["目标 SKU", formatNumber(summary.targetCount || 0), "Prime 目标池"],
+    ["候选关系", formatNumber(summary.candidatePairCount || 0), "每个目标最多 12 条"],
+    ["直接竞品", formatNumber(summary.directCandidateCount || 0), "核心规格明确一致"],
+    ["强候选", formatNumber(summary.closeCandidateCount || 0), "字段略有缺口"],
+    ["已覆盖目标", formatNumber(summary.targetsWithDirectOrClose || 0), "有直接/强候选"],
+    ["候选品牌", formatNumber((candidates.byCandidateBrand || []).length), "非 Prime 品牌"],
+  ];
+  $("competitorSummary").innerHTML = items
+    .map(
+      ([label, value, note]) => `
+        <article class="quality-card">
+          <span>${escapeHtml(label)}</span>
+          <strong>${escapeHtml(value)}</strong>
+          <small>${escapeHtml(note)}</small>
+        </article>
+      `,
+    )
+    .join("");
+
+  const groups = candidates.targetGroups || [];
+  if (!groups.length) {
+    $("competitorGroups").innerHTML = `<p class="empty-note">暂无竞品候选。请先运行 <code>npm run competitors:build</code>。</p>`;
+    return;
+  }
+
+  $("competitorGroups").innerHTML = groups
+    .slice(0, 8)
+    .map((group) => {
+      const target = group.target || {};
+      const targetLink = target.productUrl
+        ? `<a href="${escapeHtml(target.productUrl)}" target="_blank" rel="noreferrer">${escapeHtml(target.title)}</a>`
+        : escapeHtml(target.title);
+      const candidateRows = (group.candidates || [])
+        .slice(0, 5)
+        .map((row) => {
+          const candidate = row.candidate || {};
+          const candidateLink = candidate.productUrl
+            ? `<a href="${escapeHtml(candidate.productUrl)}" target="_blank" rel="noreferrer">${escapeHtml(candidate.title)}</a>`
+            : escapeHtml(candidate.title);
+          const reasons = (row.reasons || []).slice(0, 3).join("；") || "规格相近";
+          const risks = (row.risks || []).slice(0, 2).join("；");
+          return `
+            <tr>
+              <td><span class="tier ${tierClass(row.tier)}">${escapeHtml(row.label)}</span></td>
+              <td>${formatNumber(row.score)}</td>
+              <td>${escapeHtml(candidate.brand || "-")}</td>
+              <td>${escapeHtml(candidate.series || "-")}</td>
+              <td class="product-title">${candidateLink}</td>
+              <td>${escapeHtml(specText(candidate))}</td>
+              <td>${formatMoney(candidate.price)}</td>
+              <td>${row.priceDeltaPct > 0 ? "+" : ""}${row.priceDeltaPct ?? "-"}%</td>
+              <td>${escapeHtml(reasons)}${risks ? `<small class="risk">风险：${escapeHtml(risks)}</small>` : ""}</td>
+            </tr>
+          `;
+        })
+        .join("");
+      return `
+        <article class="competitor-card">
+          <header>
+            <div>
+              <div class="meta">
+                <span class="pill">${escapeHtml(target.series || "未识别系列")}</span>
+                <span class="pill">${escapeHtml(specText(target))}</span>
+              </div>
+              <h3>${targetLink}</h3>
+              <p>${escapeHtml(target.website || "-")} · ${formatMoney(target.price)} · ${escapeHtml(target.modelCode || "无型号")}</p>
+            </div>
+            <strong>${formatNumber(group.summary?.candidates || 0)} 候选</strong>
+          </header>
+          <div class="table-wrap compact">
+            <table>
+              <thead>
+                <tr>
+                  <th>层级</th>
+                  <th>分</th>
+                  <th>品牌</th>
+                  <th>系列</th>
+                  <th>候选商品</th>
+                  <th>规格</th>
+                  <th>价格</th>
+                  <th>价差</th>
+                  <th>原因/风险</th>
+                </tr>
+              </thead>
+              <tbody>${candidateRows}</tbody>
+            </table>
+          </div>
+        </article>
+      `;
+    })
+    .join("");
+}
+
 function renderAutomation() {
   $("automationGrid").innerHTML = data.automationMatrix
     .map(
@@ -495,6 +623,7 @@ function renderMethodology() {
     <p>历史来源：${escapeHtml(data.methodology.historySource)}</p>
     <p>提醒来源：${escapeHtml(data.methodology.alertsSource || "data/daily_alerts/latest_alerts.json")}</p>
     <p>SKU 标准字段来源：${escapeHtml(data.methodology.normalizedSkuSource || "data/normalized_skus/latest_normalized_skus.json")}</p>
+    <p>竞品池候选来源：${escapeHtml(data.methodology.competitorCandidatesSource || "data/competitor_candidates/latest_competitor_candidates.json")}</p>
     <ul>
       ${data.methodology.fieldNotes.map((note) => `<li>${escapeHtml(note)}</li>`).join("")}
     </ul>
@@ -512,6 +641,7 @@ function renderAll() {
   renderBrandLeaderboard();
   renderSkuQuality();
   renderSeriesLeaderboard();
+  renderCompetitorCandidates();
   renderExecutionChecklist();
   renderAutomation();
   renderInsights();

@@ -64,6 +64,21 @@ data/normalized_skus/latest_normalized_skus.csv
 
 It also upserts SQLite `sku_normalized_fields`, including brand, product series, model code, capacity, voltage, inverter, cooling mode, confidence, and review flags.
 
+Build Prime-centered competitor candidate groups:
+
+```bash
+npm run competitors:build
+```
+
+This writes:
+
+```text
+data/competitor_candidates/latest_competitor_candidates.json
+data/competitor_candidates/latest_competitor_candidates.csv
+```
+
+It also upserts SQLite `competitor_candidate_runs` and `competitor_candidates`. The output is a reviewable candidate pool, not a final competitor list.
+
 ## Daily Automation
 
 Run the daily crawler wrapper manually:
@@ -111,13 +126,14 @@ Optional repository secret:
 VPN_CHECK_URL
 ```
 
-The workflow restores cached `data/`, runs `npm run daily:crawl`, rebuilds normalized SKU fields, daily alerts, and dashboard data, uploads artifacts, and can optionally publish the dashboard to GitHub Pages.
+The workflow restores cached `data/`, runs `npm run daily:crawl`, rebuilds normalized SKU fields, competitor candidates, daily alerts, and dashboard data, uploads artifacts, and can optionally publish the dashboard to GitHub Pages.
 
 Cloud artifacts include the latest JSON snapshots, crawl logs, the generated dashboard files, daily alerts, and the main SQLite database:
 
 ```text
 data/ac_price_monitor_mexico_v2.db
 data/normalized_skus/latest_normalized_skus.json
+data/competitor_candidates/latest_competitor_candidates.json
 data/daily_alerts/latest_alerts.json
 web/competitor-intel-dashboard/data.js
 ```

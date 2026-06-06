@@ -31,6 +31,7 @@ The daily wrapper then:
 - runs the selected crawlers in sequence;
 - writes/updates the SQLite database at `data/ac_price_monitor_mexico_v2.db`;
 - builds normalized SKU fields at `data/normalized_skus/latest_normalized_skus.json`;
+- builds competitor candidate groups at `data/competitor_candidates/latest_competitor_candidates.json`;
 - builds daily alerts at `data/daily_alerts/latest_alerts.json`;
 - writes logs under `data/daily_crawls/`;
 - rebuilds `web/competitor-intel-dashboard/data.js`;
@@ -48,6 +49,7 @@ Artifacts include:
 - `data/ac_price_monitor_mexico_v2.db`
 - `data/ac_price_monitor_mexico_v2.db-*` when SQLite WAL sidecar files exist
 - `data/normalized_skus/**`
+- `data/competitor_candidates/**`
 - `data/daily_alerts/**`
 - latest per-site product snapshots and run summaries
 - `web/competitor-intel-dashboard/**`
@@ -103,6 +105,19 @@ The first MVP extracts:
 - confidence score and review flags.
 
 Product series is handled carefully: explicit title series names are treated as higher confidence, while model-prefix families are kept as lower-confidence `model_family` values until manually calibrated.
+
+## Competitor Candidate Groups
+
+After normalized SKU fields are built, `npm run competitors:build` creates a reviewable Prime-centered candidate pool:
+
+```text
+data/competitor_candidates/latest_competitor_candidates.json
+data/competitor_candidates/latest_competitor_candidates.csv
+```
+
+It also upserts SQLite `competitor_candidate_runs` and `competitor_candidates`.
+
+The candidate pool is scored by product type, capacity, voltage, inverter/on-off signal, cooling mode, price closeness, brand, and series signal. It should be treated as an A03 review queue, not as the final approved competitor list.
 
 ## Publishing The Web Dashboard
 

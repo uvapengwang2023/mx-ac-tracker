@@ -14,6 +14,7 @@
     "daily:install": "node scripts/install_daily_crawl_launchd.js",
     "daily:uninstall": "node scripts/install_daily_crawl_launchd.js --uninstall",
     "sku:normalize": "node scripts/build_normalized_sku_fields.js",
+    "competitors:build": "node scripts/build_competitor_candidates.js",
     "alerts:build": "node scripts/build_daily_alerts.js",
     "dashboard:build": "node scripts/build_competitor_dashboard_data.js",
     "dashboard:serve": "python3 -m http.server 4173 --directory web/competitor-intel-dashboard"

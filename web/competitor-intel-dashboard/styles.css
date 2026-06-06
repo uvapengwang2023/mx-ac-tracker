@@ -17,8 +17,13 @@
   box-sizing: border-box;
 }
 
+html {
+  overflow-x: hidden;
+}
+
 body {
   margin: 0;
+  overflow-x: hidden;
   background: var(--bg);
   color: var(--ink);
   font-family:
@@ -27,6 +32,7 @@ body {
 }
 
 main {
+  min-width: 0;
   width: min(1440px, calc(100% - 32px));
   margin: 0 auto;
   padding: 24px 0 56px;
@@ -184,6 +190,7 @@ input {
 }
 
 .panel {
+  min-width: 0;
   border: 1px solid var(--line);
   border-radius: 8px;
   padding: 18px;
@@ -264,6 +271,7 @@ input {
 .insight-list,
 .automation-grid,
 .checklist-grid,
+.competitor-grid,
 .alert-grid,
 .quality-grid {
   display: grid;
@@ -393,6 +401,7 @@ input {
 .rank-row,
 .insight,
 .automation-card,
+.competitor-card,
 .quality-card {
   border: 1px solid var(--line);
   border-radius: 8px;
@@ -425,7 +434,8 @@ input {
 
 .site-card header,
 .rank-row,
-.insight header {
+.insight header,
+.competitor-card header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -512,7 +522,8 @@ input {
   gap: 6px;
 }
 
-.checklist-card .pill {
+.checklist-card .pill,
+.competitor-card .pill {
   border: 1px solid var(--line);
   border-radius: 4px;
   padding: 2px 6px;
@@ -522,7 +533,8 @@ input {
 }
 
 .checklist-card p,
-.automation-card p {
+.automation-card p,
+.competitor-card p {
   margin-bottom: 0;
   color: var(--muted);
   font-size: 13px;
@@ -532,6 +544,64 @@ input {
   border-left: 4px solid var(--teal);
   padding-left: 10px;
   color: var(--ink);
+}
+
+.competitor-grid {
+  margin-top: 12px;
+}
+
+.competitor-card {
+  display: grid;
+  gap: 10px;
+}
+
+.competitor-card h3 {
+  margin: 4px 0 3px;
+}
+
+.competitor-card h3 a {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.competitor-card header > strong {
+  flex: 0 0 auto;
+  color: var(--teal);
+  font-size: 16px;
+}
+
+.tier {
+  display: inline-flex;
+  min-width: 68px;
+  justify-content: center;
+  border-radius: 4px;
+  padding: 3px 7px;
+  font-size: 12px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.tier.strong {
+  background: #e8f3ef;
+  color: var(--teal);
+}
+
+.tier.medium {
+  background: #fff4df;
+  color: var(--amber);
+}
+
+.tier.low,
+.tier.neutral {
+  background: #edf0ef;
+  color: var(--steel);
+}
+
+.risk {
+  display: block;
+  margin-top: 4px;
+  color: var(--amber);
+  font-size: 12px;
 }
 
 .insight strong {
@@ -561,10 +631,17 @@ input {
 }
 
 .table-wrap {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   max-height: 520px;
   overflow: auto;
   border: 1px solid var(--line);
   border-radius: 8px;
+}
+
+.table-wrap.compact {
+  max-height: 360px;
 }
 
 table {
@@ -653,6 +730,7 @@ td a {
   .kpi-grid,
   .automation-grid,
   .checklist-grid,
+  .competitor-grid,
   .alert-grid,
   .quality-grid {
     grid-template-columns: 1fr;

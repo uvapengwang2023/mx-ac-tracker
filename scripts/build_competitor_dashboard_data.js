@@ -8,6 +8,7 @@ const OUT_FILE = path.join(OUT_DIR, "data.js");
 const DB_PATH = path.join(ROOT, "data", "ac_price_monitor_mexico_v2.db");
 const ALERTS_PATH = "data/daily_alerts/latest_alerts.json";
 const NORMALIZED_SKUS_PATH = "data/normalized_skus/latest_normalized_skus.json";
+const COMPETITOR_CANDIDATES_PATH = "data/competitor_candidates/latest_competitor_candidates.json";
 
 const SITE_CONFIG = [
   {
@@ -523,7 +524,7 @@ function buildExecutionChecklist() {
       output: "每日更新的数据层 + 日志 + 网页 KPI/价格趋势/重点变价 + 云端 artifact",
       acceptance: "云端 workflow 可定时触发；失败平台显示原因；至少两次抓取后能识别变价。",
       humanGate: "确认运行时间、云端代理、验证码处理方式、必须覆盖的平台和数据持久化方式。",
-      status: "可云端部署",
+      status: "云端 MVP 已验证，待连续观察",
       pageModule: "平台概览、重点变价、价格趋势",
     },
     {
@@ -532,24 +533,24 @@ function buildExecutionChecklist() {
       title: "SKU 标准字段自动抽取",
       objective: "把标题和详情页转换成可比较字段：品牌、产品系列、型号、吨位/BTU、电压、变频、冷暖、安装类型。",
       dataNeeded: "商品标题、PDP 详情、pdp_specs_json/detail_specs_json、Prime 规格表",
-      aiAutomation: "规则抽取标题字段，优先识别标题中的明确系列名，其次用低置信度型号族补充，生成 confidence 和待人工复核列表。",
+      aiAutomation: "规则抽取标题字段，优先识别标题中的明确系列名，其次用低置信度型号特征推断补充，生成 confidence 和待人工复核列表。",
       output: "data/normalized_skus/latest_normalized_skus.json/csv + SQLite sku_normalized_fields 表",
       acceptance: "核心字段覆盖率超过 85%；低置信度 SKU 单独列出；抽样 30 个关键 SKU 准确率可接受。",
-      humanGate: "定义标准字段口径，确认 1T/12000 BTU、110/115/127V 等等价规则。",
-      status: "已打底",
+      humanGate: "定义标准字段口径，确认型号到系列的映射规则，例如 Prime B 后缀与 Bright family 的关系。",
+      status: "第一轮完成，进入系列词典",
       pageModule: "产品库、规格覆盖、筛选器",
     },
     {
       id: "A03",
       priority: "P0",
       title: "竞品池自动分层",
-      objective: "把所有商品分成直接竞品、价格标杆、功能标杆、替代品和排除项。",
+      objective: "以 Prime SKU 为目标池，把所有商品分成直接竞品、强候选、价格/规格参照、内部参照和观察项。",
       dataNeeded: "标准规格字段、价格、平台、品牌、商品链接、你指定的目标 SKU",
-      aiAutomation: "按价格带、规格相似度、品牌和平台覆盖生成候选竞品分组。",
-      output: "watchlist + competitor_tier 字段",
+      aiAutomation: "按产品类型、容量、变频/定频、单冷/冷暖、电压、价格接近度、品牌和系列线索生成候选竞品分组。",
+      output: "data/competitor_candidates/latest_competitor_candidates.json/csv + SQLite competitor_candidates 表",
       acceptance: "每个目标 SKU 至少给出 5-10 个候选可比竞品；排除便携风扇/冷风机等非同类。",
       humanGate: "最终确认哪些是真竞品，哪些只是噪音或不可比。",
-      status: "待启动",
+      status: "第一版已启动",
       pageModule: "Watchlist、竞品分层",
     },
     {
@@ -643,6 +644,15 @@ async function main() {
     byReviewFlag: [],
     rows: [],
   });
+  const competitorCandidates = await readJson(COMPETITOR_CANDIDATES_PATH, {
+    status: "missing",
+    summary: {},
+    byTier: [],
+    byCandidateBrand: [],
+    targetGroups: [],
+    flatCandidates: [],
+    methodology: {},
+  });
   const normalizedByKey = new Map(
     (normalizedSkus.rows || [])
       .filter((row) => row.siteId && row.productId)
@@ -707,6 +717,11 @@ async function main() {
       dailyPriceIncreases: dailyAlerts.summary?.priceIncreases || 0,
       dailyNewProducts: dailyAlerts.summary?.newProducts || 0,
       dailyRemovedProducts: dailyAlerts.summary?.removedProducts || 0,
+      competitorTargetCount: competitorCandidates.summary?.targetCount || 0,
+      competitorCandidatePairCount: competitorCandidates.summary?.candidatePairCount || 0,
+      competitorDirectCandidateCount: competitorCandidates.summary?.directCandidateCount || 0,
+      competitorCloseCandidateCount: competitorCandidates.summary?.closeCandidateCount || 0,
+      competitorTargetsWithDirectOrClose: competitorCandidates.summary?.targetsWithDirectOrClose || 0,
       skuSeriesCoveragePct: normalizedSkus.summary?.seriesCoveragePct || 0,
       skuNamedSeriesCoveragePct: normalizedSkus.summary?.namedSeriesCoveragePct || 0,
       skuCapacityCoveragePct: normalizedSkus.summary?.capacityCoveragePct || 0,
@@ -741,6 +756,15 @@ async function main() {
       summary: normalizedSkus.summary || {},
       byReviewFlag: normalizedSkus.byReviewFlag || [],
     },
+    competitorCandidates: {
+      source: COMPETITOR_CANDIDATES_PATH,
+      generatedAt: competitorCandidates.generatedAt || null,
+      summary: competitorCandidates.summary || {},
+      byTier: competitorCandidates.byTier || [],
+      byCandidateBrand: competitorCandidates.byCandidateBrand || [],
+      methodology: competitorCandidates.methodology || {},
+      targetGroups: (competitorCandidates.targetGroups || []).slice(0, 12),
+    },
     dailyAlerts,
     insights: buildInsights({ rows: allProducts, sites: siteSummaries, priceBands, changes: allChanges, trend }),
     executionChecklist: buildExecutionChecklist(),
@@ -756,10 +780,12 @@ async function main() {
       historySource: "data/ac_price_monitor_mexico_v2.db: price_facts + product_master",
       alertsSource: ALERTS_PATH,
       normalizedSkuSource: NORMALIZED_SKUS_PATH,
+      competitorCandidatesSource: COMPETITOR_CANDIDATES_PATH,
       fieldNotes: [
         "价格使用 sale_price_mxn；original_price_mxn 仅作为折扣参考。",
         "提醒中心来自 SQLite price_facts 的最新日期与历史日期对比，可用于发现降价、涨价、上新、下架和抓取覆盖异常。",
         "SKU 标准字段来自标题和已抓取字段的规则抽取；产品系列优先使用标题中的明确系列名，其次才使用低置信度型号族。",
+        "竞品池候选来自标准字段的规则打分；它是候选清单，不是最终竞品名单，必须保留人工确认关口。",
         "品牌、品类、吨位、电压、变频字段为标题/已抓取字段推断，适合作为候选分类，关键 SKU 仍需人工复核。",
         "现有数据不包含真实销量、广告投放、评分评论和线下渠道政策；网页会把这些标为人工/后续数据源。",
       ],

@@ -57,6 +57,7 @@ function parseArgs(argv) {
     skipPreflight: false,
     strictPreflight: false,
     buildSkuFields: true,
+    buildCompetitors: true,
     buildDashboard: true,
     buildAlerts: true,
     interactive: false,
@@ -69,6 +70,7 @@ function parseArgs(argv) {
     else if (arg === "--skip-preflight") args.skipPreflight = true;
     else if (arg === "--strict-preflight") args.strictPreflight = true;
     else if (arg === "--no-sku-normalize") args.buildSkuFields = false;
+    else if (arg === "--no-competitors-build") args.buildCompetitors = false;
     else if (arg === "--no-dashboard-build") args.buildDashboard = false;
     else if (arg === "--no-alerts-build") args.buildAlerts = false;
     else if (arg === "--interactive") args.interactive = true;
@@ -331,6 +333,7 @@ async function main() {
     preflight: null,
     results: [],
     skuNormalization: null,
+    competitorCandidates: null,
     alertsBuild: null,
     dashboardBuild: null,
     overallStatus: "running",
@@ -406,7 +409,20 @@ async function main() {
     await appendLog(logPath, `SKU normalization: ${summary.skuNormalization.status}`);
   }
 
-  if (!anyFailed && summary.skuNormalization?.status !== "failed" && args.buildAlerts) {
+  if (!anyFailed && summary.skuNormalization?.status !== "failed" && args.buildCompetitors) {
+    await appendLog(logPath, "\nBuilding competitor candidates...");
+    summary.competitorCandidates = await runCommand({
+      label: "Competitor candidates",
+      npmArgs: ["run", "competitors:build"],
+      logPath,
+      env,
+      dryRun: args.dryRun,
+      interactive: false,
+    });
+    await appendLog(logPath, `Competitor candidates: ${summary.competitorCandidates.status}`);
+  }
+
+  if (!anyFailed && summary.skuNormalization?.status !== "failed" && summary.competitorCandidates?.status !== "failed" && args.buildAlerts) {
     await appendLog(logPath, "\nBuilding daily alerts...");
     summary.alertsBuild = await runCommand({
       label: "Daily alerts",
@@ -422,6 +438,7 @@ async function main() {
   if (
     !anyFailed &&
     summary.skuNormalization?.status !== "failed" &&
+    summary.competitorCandidates?.status !== "failed" &&
     summary.alertsBuild?.status !== "failed" &&
     args.buildDashboard
   ) {
@@ -441,6 +458,7 @@ async function main() {
   summary.overallStatus =
     anyFailed ||
     summary.skuNormalization?.status === "failed" ||
+    summary.competitorCandidates?.status === "failed" ||
     summary.alertsBuild?.status === "failed" ||
     summary.dashboardBuild?.status === "failed"
       ? "failed"
