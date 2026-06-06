@@ -1,5 +1,11 @@
 # Project Record
 
+## Cloud Automation Validation Log
+
+| Date | Platform | Run | Artifact | Sites | Proxy | Result | Products | Notes |
+| --- | --- | --- | --- | --- | --- | --- | ---: | --- |
+| 2026-06-06 | GitHub Actions | https://github.com/uvapengwang2023/mx-ac-tracker/actions/runs/27064477121 | https://github.com/uvapengwang2023/mx-ac-tracker/actions/runs/27064477121/artifacts/7455102690 | Coppel, Elektra, HomeDepotMX | None; direct cloud IP | Success | 792 | Preflight 200 OK for all three sites; dashboard `data.js` uploaded in artifact. See `06_20260606_GitHub云端三站点验证复盘.md`. |
+
 ## Daily Crawl + DB Load Log
 
 | Date (Mexico City) | Recorded At | Coppel | Elektra | HomeDepotMX | WalmartMX | Total price_facts | DB Path | Notes |

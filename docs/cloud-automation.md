@@ -67,3 +67,17 @@ Close A01 in two phases:
 For a non-technical step-by-step test plan in Chinese, see:
 
 - `05_20260606_GitHub云端运行测试操作手册.md`
+
+## Validation Record
+
+The first complete three-site cloud validation succeeded on 2026-06-06:
+
+- Run: https://github.com/uvapengwang2023/mx-ac-tracker/actions/runs/27064477121
+- Artifact: https://github.com/uvapengwang2023/mx-ac-tracker/actions/runs/27064477121/artifacts/7455102690
+- Sites: Coppel, Elektra, HomeDepotMX
+- Direct cloud IP: worked without `PROXY_URL`
+- Products: Coppel 434, Elektra 220, HomeDepotMX 138, total 792
+
+For the Chinese retrospective and operating notes, see:
+
+- `06_20260606_GitHub云端三站点验证复盘.md`
