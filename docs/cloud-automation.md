@@ -13,6 +13,8 @@ This project can run the crawler stack in the cloud with GitHub Actions. The clo
 5. Run it manually once with `workflow_dispatch`.
 6. After it succeeds, let the scheduled run continue daily.
 
+The current workflow defaults to direct GitHub cloud IP access when no `PROXY_URL` is configured. If a site starts blocking GitHub's cloud IPs, add `PROXY_URL` and keep the same workflow.
+
 ## What Runs In The Cloud
 
 The workflow runs:

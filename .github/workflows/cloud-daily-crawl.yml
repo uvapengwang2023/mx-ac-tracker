@@ -19,13 +19,13 @@ on:
           - "false"
           - "true"
       allow_direct_ip:
-        description: "Manual testing only: allow direct cloud IP for crawlers that normally require proxy"
+        description: "Allow direct cloud IP for crawlers that normally require proxy"
         required: false
-        default: "false"
+        default: "true"
         type: choice
         options:
-          - "false"
           - "true"
+          - "false"
 
 permissions:
   contents: read
@@ -43,7 +43,7 @@ env:
   VPN_CHECK_URL: ${{ secrets.VPN_CHECK_URL }}
   DAILY_CRAWL_NOTIFY: "false"
   DAILY_CRAWL_STRICT_PREFLIGHT: "true"
-  DAILY_CRAWL_ALLOW_DIRECT_IP: ${{ github.event.inputs.allow_direct_ip || 'false' }}
+  DAILY_CRAWL_ALLOW_DIRECT_IP: ${{ github.event.inputs.allow_direct_ip || vars.ALLOW_DIRECT_IP || 'true' }}
 
 jobs:
   crawl:
