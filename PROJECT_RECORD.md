@@ -4,6 +4,7 @@
 
 | Date | Topic | Document | Notes |
 | --- | --- | --- | --- |
+| 2026-06-06 | A02 spec extraction correction | `11_20260606_A02参数抽取口径修正_冷媒尺寸OCR.md` | Records unit normalization for refrigerant charge, complete indoor/outdoor unit and package dimension fields, solo-frio/frio-calor dimension variants, and a better PDF extraction approach that avoids ordinary OCR as the main method. |
 | 2026-06-06 | A03 business gate clarification | `10_20260606_A03竞品池自动分层第一版记录.md` | Clarifies that A03 is a technical prototype for now. Formal competitor grouping is paused until A02 product series and series price ladders are completed. |
 | 2026-06-06 | A03 competitor candidate pool first version | `10_20260606_A03竞品池自动分层第一版记录.md` | Starts Prime-centered competitor candidate grouping, writes JSON/CSV and SQLite tables, connects the dashboard, and adds cloud artifact coverage. |
 | 2026-06-06 | Competitor analysis automation, cloud crawl, SKU normalization, sample audit | `09_20260606_竞品分析自动化阶段总复盘与经验.md` | Consolidates A01 cloud automation, A02 SKU normalization, GitHub Actions validation, data persistence, dashboard, manual-vs-AI responsibilities, lessons learned, risks, and next steps. |
@@ -19,6 +20,7 @@
 
 | Date | Area | Progress | Validation | Related Files |
 | --- | --- | --- | --- | --- |
+| 2026-06-06 | Parameter extraction gates | Added A02 parameter-extraction corrections: refrigerant charge must be normalized to kg while preserving raw values; indoor/outdoor bare-unit dimensions and package dimensions must be separate; solo-frio/frio-calor dimension rows must be preserved; PDF extraction should prioritize coordinate-based text/table extraction instead of ordinary OCR. | Reviewed current Prime CSV/script and confirmed packaged dimensions exist in some source rows but are not in the core CSV, and `pypdf` text extraction has a text layer but poor table order. | `11_20260606_A02参数抽取口径修正_冷媒尺寸OCR.md`; `outputs/prime_aircon_specs_20260528_103702/04_Prime空调参数工具化方案v2_基于23型号经验_20260528_110609.md` |
 | 2026-06-06 | Product series inference | Confirmed that model codes can imply product series. Prime `EMPRC182-B` should keep `B -> Bright family` as a low-confidence model-based inference, even when `Bright` is absent from the title. The key principle is to preserve the inference source and confidence instead of discarding useful model-code signals. | Re-ran `npm run sku:normalize`; sample output for `EMPRC182-B` is `productSeries=Bright family`, `seriesSource=model_family_rule`, `seriesType=model_family`, `seriesConfidence=low`, `reviewFlags=series_is_model_family`. Rebuilt dashboard data with `npm run dashboard:build`. | `scripts/build_normalized_sku_fields.js`; `07_20260606_SKU标准字段与产品系列抽取复盘.md`; `08_20260606_SKU标准字段30样本复核报告.md`; `09_20260606_竞品分析自动化阶段总复盘与经验.md` |
 
 ## Cloud Automation Validation Log
