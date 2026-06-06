@@ -1,5 +1,11 @@
 # Project Record
 
+## Stage Retrospectives
+
+| Date | Topic | Document | Notes |
+| --- | --- | --- | --- |
+| 2026-06-06 | Competitor analysis automation, cloud crawl, SKU normalization, sample audit | `09_20260606_竞品分析自动化阶段总复盘与经验.md` | Consolidates A01 cloud automation, A02 SKU normalization, GitHub Actions validation, data persistence, dashboard, manual-vs-AI responsibilities, lessons learned, risks, and next steps. |
+
 ## Cloud Automation Validation Log
 
 | Date | Platform | Run | Artifact | Sites | Proxy | Result | Products | Notes |
