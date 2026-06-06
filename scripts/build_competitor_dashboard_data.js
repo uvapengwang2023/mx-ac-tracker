@@ -6,6 +6,7 @@ const ROOT = process.cwd();
 const OUT_DIR = path.join(ROOT, "web", "competitor-intel-dashboard");
 const OUT_FILE = path.join(OUT_DIR, "data.js");
 const DB_PATH = path.join(ROOT, "data", "ac_price_monitor_mexico_v2.db");
+const ALERTS_PATH = "data/daily_alerts/latest_alerts.json";
 
 const SITE_CONFIG = [
   {
@@ -553,11 +554,11 @@ function buildExecutionChecklist() {
       title: "价格变化预警",
       objective: "对重点品牌/重点 SKU 的降价、涨价、新品、下架自动提醒。",
       dataNeeded: "watchlist、latest_price_changes、price_facts",
-      aiAutomation: "按阈值生成每日摘要：大幅降价、连续降价、新品进入、竞品下架。",
-      output: "daily_alerts.json + 页面提醒区",
+      aiAutomation: "从 SQLite price_facts 生成每日摘要：大幅降价、涨价、新品进入、竞品下架和抓取覆盖异常。",
+      output: "data/daily_alerts/latest_alerts.json + 页面提醒区",
       acceptance: "可配置品牌/SKU/价格阈值；每条提醒有原因、幅度、链接和建议动作。",
       humanGate: "定义哪些品牌/SKU 值得提醒，以及多大变化需要动作。",
-      status: "待启动",
+      status: "已打底",
       pageModule: "提醒中心",
     },
     {
@@ -605,6 +606,23 @@ async function main() {
   const allProducts = [];
   const allChanges = [];
   const siteSummaries = [];
+  const dailyAlerts = await readJson(ALERTS_PATH, {
+    status: "missing",
+    summary: {
+      actionableAlerts: 0,
+      priceDrops: 0,
+      priceIncreases: 0,
+      newProducts: 0,
+      removedProducts: 0,
+      coverageAlerts: 0,
+    },
+    priceDrops: [],
+    priceIncreases: [],
+    newProducts: [],
+    removedProducts: [],
+    coverageAlerts: [],
+    dataQuality: [],
+  });
 
   for (const site of SITE_CONFIG) {
     const latest = asArray(await readJson(site.latestPath, []));
@@ -642,6 +660,11 @@ async function main() {
       latestPriceChanges: changeCounts.price_changed || 0,
       latestNewProducts: changeCounts.new_product || 0,
       latestRemovedProducts: changeCounts.removed_product || 0,
+      dailyActionableAlerts: dailyAlerts.summary?.actionableAlerts || 0,
+      dailyPriceDrops: dailyAlerts.summary?.priceDrops || 0,
+      dailyPriceIncreases: dailyAlerts.summary?.priceIncreases || 0,
+      dailyNewProducts: dailyAlerts.summary?.newProducts || 0,
+      dailyRemovedProducts: dailyAlerts.summary?.removedProducts || 0,
       inferredBrandCoveragePct: round(
         ((allProducts.length - allProducts.filter((row) => row.brand === "未识别").length) / allProducts.length) * 100,
         1,
@@ -661,6 +684,7 @@ async function main() {
     brandLeaderboard: summarizeDimension(allProducts, "brand", 16),
     categoryMix: summarizeDimension(allProducts, "category", 10),
     trend,
+    dailyAlerts,
     insights: buildInsights({ rows: allProducts, sites: siteSummaries, priceBands, changes: allChanges, trend }),
     executionChecklist: buildExecutionChecklist(),
     automationMatrix: buildAutomationMatrix(),
@@ -673,8 +697,10 @@ async function main() {
         run: site.runPath,
       })),
       historySource: "data/ac_price_monitor_mexico_v2.db: price_facts + product_master",
+      alertsSource: ALERTS_PATH,
       fieldNotes: [
         "价格使用 sale_price_mxn；original_price_mxn 仅作为折扣参考。",
+        "提醒中心来自 SQLite price_facts 的最新日期与历史日期对比，可用于发现降价、涨价、上新、下架和抓取覆盖异常。",
         "品牌、品类、吨位、电压、变频字段为标题/已抓取字段推断，适合作为候选分类，关键 SKU 仍需人工复核。",
         "现有数据不包含真实销量、广告投放、评分评论和线下渠道政策；网页会把这些标为人工/后续数据源。",
       ],

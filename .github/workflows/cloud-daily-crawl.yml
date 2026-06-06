@@ -2,7 +2,7 @@ name: Cloud Daily Crawl
 
 on:
   schedule:
-    # 09:00 Mexico City during standard UTC-6 offset. Adjust if you want a different local time.
+    # 09:00 Monterrey during the current UTC-6 offset. GitHub may start scheduled jobs a bit later.
     - cron: "0 15 * * *"
   workflow_dispatch:
     inputs:
@@ -87,6 +87,9 @@ jobs:
           name: mx-ac-crawl-${{ github.run_id }}
           path: |
             data/daily_crawls/**
+            data/daily_alerts/**
+            data/ac_price_monitor_mexico_v2.db
+            data/ac_price_monitor_mexico_v2.db-*
             data/*/latest_products.json
             data/*/runs/latest_run.json
             data/*/reports/latest_price_changes.json

@@ -97,6 +97,7 @@ function renderKpis(products) {
   const kpis = [
     ["当前 SKU", formatNumber(products.length), `${data.summary.sitesTracked} 个平台`],
     ["价格中位数", formatMoney(medianPrice), "按当前筛选"],
+    ["今日提醒", formatNumber(data.summary.dailyActionableAlerts || 0), "来自 SQLite 历史对比"],
     ["最新变价", formatNumber(data.summary.latestPriceChanges), "来自 price change 文件"],
     ["品牌识别率", `${data.summary.inferredBrandCoveragePct}%`, "标题/字段推断"],
     ["历史天数", formatNumber(data.dateRange.trackedDays), `${data.dateRange.start || "-"} 至 ${data.dateRange.end || "-"}`],
@@ -112,6 +113,96 @@ function renderKpis(products) {
         </article>
       `,
     )
+    .join("");
+}
+
+function dailyAlerts() {
+  return (
+    data.dailyAlerts || {
+      status: "missing",
+      summary: {},
+      priceDrops: [],
+      priceIncreases: [],
+      newProducts: [],
+      removedProducts: [],
+      coverageAlerts: [],
+      dataQuality: [],
+    }
+  );
+}
+
+function alertTypeLabel(type) {
+  return {
+    price_drop: "降价",
+    price_increase: "涨价",
+    new_product: "新品",
+    removed_product: "下架",
+    coverage_drop: "覆盖异常",
+  }[type] || "提醒";
+}
+
+function alertValue(alert) {
+  if (alert.type === "price_drop" || alert.type === "price_increase") {
+    return `${formatMoney(alert.oldPrice)} -> ${formatMoney(alert.newPrice)} (${alert.delta > 0 ? "+" : ""}${formatMoney(alert.delta)})`;
+  }
+  if (alert.type === "coverage_drop") {
+    return `${formatNumber(alert.previousCount)} -> ${formatNumber(alert.latestCount)} SKU`;
+  }
+  return formatMoney(alert.price);
+}
+
+function renderDailyAlerts() {
+  const alerts = dailyAlerts();
+  const summary = alerts.summary || {};
+  $("alertDate").textContent = alerts.latestDate ? `${alerts.latestDate}` : alerts.status || "-";
+  $("alertSummary").innerHTML = [
+    ["降价", summary.priceDrops || 0],
+    ["涨价", summary.priceIncreases || 0],
+    ["新品", summary.newProducts || 0],
+    ["下架", summary.removedProducts || 0],
+    ["异常", summary.coverageAlerts || 0],
+  ]
+    .map(
+      ([label, value]) => `
+        <div>
+          <span>${escapeHtml(label)}</span>
+          <strong>${formatNumber(value)}</strong>
+        </div>
+      `,
+    )
+    .join("");
+
+  const cards = [
+    ...(alerts.coverageAlerts || []),
+    ...(alerts.priceDrops || []).slice(0, 5),
+    ...(alerts.priceIncreases || []).slice(0, 3),
+    ...(alerts.newProducts || []).slice(0, 3),
+    ...(alerts.removedProducts || []).slice(0, 3),
+  ].slice(0, 14);
+
+  if (!cards.length) {
+    const note = alerts.dataQuality?.[0]?.message || "当前没有达到阈值的自动提醒。";
+    $("alertCards").innerHTML = `<article class="alert-card empty"><h3>暂无重点提醒</h3><p>${escapeHtml(note)}</p></article>`;
+    return;
+  }
+
+  $("alertCards").innerHTML = cards
+    .map((alert) => {
+      const title = alert.link
+        ? `<a href="${escapeHtml(alert.link)}" target="_blank" rel="noreferrer">${escapeHtml(alert.title || alert.website)}</a>`
+        : escapeHtml(alert.title || alert.website);
+      return `
+        <article class="alert-card ${escapeHtml(alert.severity || "low")}">
+          <header>
+            <span class="alert-type">${escapeHtml(alertTypeLabel(alert.type))}</span>
+            <strong>${escapeHtml(alert.website || "-")}</strong>
+          </header>
+          <h3>${title}</h3>
+          <p class="alert-value">${escapeHtml(alertValue(alert))}</p>
+          <p>${escapeHtml(alert.reason || "")}</p>
+        </article>
+      `;
+    })
     .join("");
 }
 
@@ -357,6 +448,7 @@ function renderProducts() {
 function renderMethodology() {
   $("methodology").innerHTML = `
     <p>历史来源：${escapeHtml(data.methodology.historySource)}</p>
+    <p>提醒来源：${escapeHtml(data.methodology.alertsSource || "data/daily_alerts/latest_alerts.json")}</p>
     <ul>
       ${data.methodology.fieldNotes.map((note) => `<li>${escapeHtml(note)}</li>`).join("")}
     </ul>
@@ -368,6 +460,7 @@ function renderAll() {
   $("generatedAt").textContent = formatDate(data.generatedAt);
   renderKpis(products);
   renderTrend();
+  renderDailyAlerts();
   renderPriceBands();
   renderSites();
   renderBrandLeaderboard();

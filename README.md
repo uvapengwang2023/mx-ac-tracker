@@ -84,7 +84,7 @@ Cloud scheduling is available through GitHub Actions:
 - Workflow: `.github/workflows/cloud-daily-crawl.yml`
 - Setup notes: `docs/cloud-automation.md`
 
-Required repository secret:
+Optional repository secret:
 
 ```text
 PROXY_URL
@@ -96,7 +96,17 @@ Optional repository secret:
 VPN_CHECK_URL
 ```
 
-The workflow restores cached `data/`, runs `npm run daily:crawl`, rebuilds the dashboard data, uploads artifacts, and can optionally publish the dashboard to GitHub Pages.
+The workflow restores cached `data/`, runs `npm run daily:crawl`, rebuilds daily alerts and dashboard data, uploads artifacts, and can optionally publish the dashboard to GitHub Pages.
+
+Cloud artifacts include the latest JSON snapshots, crawl logs, the generated dashboard files, daily alerts, and the main SQLite database:
+
+```text
+data/ac_price_monitor_mexico_v2.db
+data/daily_alerts/latest_alerts.json
+web/competitor-intel-dashboard/data.js
+```
+
+`data/daily_alerts/latest_alerts.json` is generated from SQLite `price_facts` and can be used for price-drop, price-increase, new-product, removed-product, and crawl-coverage alerts.
 
 One-click run on macOS Finder:
 

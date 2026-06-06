@@ -57,6 +57,7 @@ function parseArgs(argv) {
     skipPreflight: false,
     strictPreflight: false,
     buildDashboard: true,
+    buildAlerts: true,
     interactive: false,
     notify: false,
     sites: null,
@@ -67,6 +68,7 @@ function parseArgs(argv) {
     else if (arg === "--skip-preflight") args.skipPreflight = true;
     else if (arg === "--strict-preflight") args.strictPreflight = true;
     else if (arg === "--no-dashboard-build") args.buildDashboard = false;
+    else if (arg === "--no-alerts-build") args.buildAlerts = false;
     else if (arg === "--interactive") args.interactive = true;
     else if (arg === "--notify") args.notify = true;
     else if (arg.startsWith("--sites=")) {
@@ -326,6 +328,7 @@ async function main() {
     logPath,
     preflight: null,
     results: [],
+    alertsBuild: null,
     dashboardBuild: null,
     overallStatus: "running",
   };
@@ -387,7 +390,20 @@ async function main() {
   }
 
   const anyFailed = summary.results.some((result) => result.status === "failed");
-  if (!anyFailed && args.buildDashboard) {
+  if (!anyFailed && args.buildAlerts) {
+    await appendLog(logPath, "\nBuilding daily alerts...");
+    summary.alertsBuild = await runCommand({
+      label: "Daily alerts",
+      npmArgs: ["run", "alerts:build"],
+      logPath,
+      env,
+      dryRun: args.dryRun,
+      interactive: false,
+    });
+    await appendLog(logPath, `Daily alerts: ${summary.alertsBuild.status}`);
+  }
+
+  if (!anyFailed && summary.alertsBuild?.status !== "failed" && args.buildDashboard) {
     await appendLog(logPath, "\nBuilding dashboard data...");
     summary.dashboardBuild = await runCommand({
       label: "Dashboard data",
@@ -401,7 +417,10 @@ async function main() {
   }
 
   summary.finishedAt = new Date().toISOString();
-  summary.overallStatus = anyFailed || summary.dashboardBuild?.status === "failed" ? "failed" : "success";
+  summary.overallStatus =
+    anyFailed || summary.alertsBuild?.status === "failed" || summary.dashboardBuild?.status === "failed"
+      ? "failed"
+      : "success";
   await appendLog(logPath, `\nDaily crawl finished: ${summary.overallStatus}`);
   await fs.writeFile(LATEST_RUN_FILE, JSON.stringify(summary, null, 2), "utf8");
 
