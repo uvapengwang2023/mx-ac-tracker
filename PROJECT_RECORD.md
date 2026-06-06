@@ -6,6 +6,12 @@
 | --- | --- | --- | --- |
 | 2026-06-06 | Competitor analysis automation, cloud crawl, SKU normalization, sample audit | `09_20260606_竞品分析自动化阶段总复盘与经验.md` | Consolidates A01 cloud automation, A02 SKU normalization, GitHub Actions validation, data persistence, dashboard, manual-vs-AI responsibilities, lessons learned, risks, and next steps. |
 
+## SKU Normalization Progress Log
+
+| Date | Area | Progress | Validation | Related Files |
+| --- | --- | --- | --- | --- |
+| 2026-06-06 | Product series inference | Confirmed that model codes can imply product series. Prime `EMPRC182-B` should keep `B -> Bright family` as a low-confidence model-based inference, even when `Bright` is absent from the title. The key principle is to preserve the inference source and confidence instead of discarding useful model-code signals. | Re-ran `npm run sku:normalize`; sample output for `EMPRC182-B` is `productSeries=Bright family`, `seriesSource=model_family_rule`, `seriesType=model_family`, `seriesConfidence=low`, `reviewFlags=series_is_model_family`. Rebuilt dashboard data with `npm run dashboard:build`. | `scripts/build_normalized_sku_fields.js`; `07_20260606_SKU标准字段与产品系列抽取复盘.md`; `08_20260606_SKU标准字段30样本复核报告.md`; `09_20260606_竞品分析自动化阶段总复盘与经验.md` |
+
 ## Cloud Automation Validation Log
 
 | Date | Platform | Run | Artifact | Sites | Proxy | Result | Products | Notes |
