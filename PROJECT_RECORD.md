@@ -4,6 +4,7 @@
 
 | Date | Topic | Document | Notes |
 | --- | --- | --- | --- |
+| 2026-06-06 | A03 business gate clarification | `10_20260606_A03竞品池自动分层第一版记录.md` | Clarifies that A03 is a technical prototype for now. Formal competitor grouping is paused until A02 product series and series price ladders are completed. |
 | 2026-06-06 | A03 competitor candidate pool first version | `10_20260606_A03竞品池自动分层第一版记录.md` | Starts Prime-centered competitor candidate grouping, writes JSON/CSV and SQLite tables, connects the dashboard, and adds cloud artifact coverage. |
 | 2026-06-06 | Competitor analysis automation, cloud crawl, SKU normalization, sample audit | `09_20260606_竞品分析自动化阶段总复盘与经验.md` | Consolidates A01 cloud automation, A02 SKU normalization, GitHub Actions validation, data persistence, dashboard, manual-vs-AI responsibilities, lessons learned, risks, and next steps. |
 
@@ -11,6 +12,7 @@
 
 | Date | Area | Progress | Validation | Related Files |
 | --- | --- | --- | --- | --- |
+| 2026-06-06 | A03 business gates | Clarified that A03 should not be used as a formal competitor pool until A02 product series and series price ladders are completed. Formal horizontal comparison must first satisfy hard gates: same product type, same or equivalent cooling capacity, same cooling mode, same voltage, and preferably same inverter/on-off class. Price, brand, series, and platform are second-layer ranking/explanation fields. | Updated A03 record, planning checklist, total retrospective, dashboard checklist, and page copy to mark A03 as a technical prototype waiting for A02 series work. | `04_20260606_竞品分析AI自动化执行清单.md`; `09_20260606_竞品分析自动化阶段总复盘与经验.md`; `10_20260606_A03竞品池自动分层第一版记录.md`; `scripts/build_competitor_dashboard_data.js`; `web/competitor-intel-dashboard/index.html` |
 | 2026-06-06 | A03 first candidate pool | Built the first Prime-centered competitor candidate pool. The system scores candidate relationships by product type, capacity, voltage, inverter/on-off, cooling mode, price closeness, brand, and series signal. Output is intentionally a reviewable candidate pool, not a final competitor list. | Ran `npm run competitors:build` and `npm run dashboard:build`; latest output has 27 Prime target SKU, 318 candidate relationships, 171 direct candidates, 145 close candidates, and 2 benchmark references. | `scripts/build_competitor_candidates.js`; `data/competitor_candidates/latest_competitor_candidates.json`; `web/competitor-intel-dashboard/`; `10_20260606_A03竞品池自动分层第一版记录.md` |
 
 ## SKU Normalization Progress Log
